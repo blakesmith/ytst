@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
 	auto avFormatPtr = avFormat.get();
 	
-	if (avformat_open_input(&avFormatPtr, "samples/bangarang.mp4", nullptr, nullptr) != 0) {
+	if (avformat_open_input(&avFormatPtr, "samples/out.aac", nullptr, nullptr) != 0) {
 		throw std::runtime_error("Error opening the file");
 	}
 
@@ -66,15 +66,36 @@ int main(int argc, char **argv) {
 	if (avcodec_open2(avAudioCodec.get(), codec, nullptr) < 0) {
 		throw std::runtime_error("Could not open the codec");
 	}
-	
 
+	std::shared_ptr<AVFrame> avFrame(avcodec_alloc_frame(), &av_free);
 	ytst::Packet packet(avFormat.get());
-	do {
-		packet.reset(avFormat.get());
-		if (packet.packet.stream_index != audioStream->index) {
-			continue;
+	int offsetInData = 0;
+
+	while (true) {
+		if (offsetInData >= packet.packet.size) {
+			do {
+				packet.reset(avFormat.get());
+				if (packet.packet.stream_index != audioStream->index) {
+					continue;
+				}
+			} while (0);
 		}
-	} while (0);
+		AVPacket packetToSend;
+		packetToSend.data = packet.packet.data + offsetInData;
+		packetToSend.size = packet.packet.size - offsetInData;
+
+		int isFrameAvailable = 0;
+		const auto processedLength = avcodec_decode_audio4(avAudioCodec.get(),
+								   avFrame.get(),
+								   &isFrameAvailable,
+								   &packet.packet);
+		if (processedLength < 0) {
+			throw std::runtime_error("Error while processing data");
+		}
+
+		offsetInData += processedLength;
+	}
+
 
 	return 0;
 }
