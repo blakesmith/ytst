@@ -2,6 +2,7 @@
 #include <iostream>
 #include <mutex>
 #include <memory>
+#include <vector>
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -44,6 +45,28 @@ int main(int argc, char **argv) {
 	if (!audioStream) {
 		throw std::runtime_error("Didn't find any audio stream");
 	}
+
+	const auto codec = avcodec_find_decoder(audioStream->codec->codec_id);
+	if (codec == nullptr) {
+		throw std::runtime_error("Could not find a suitable audio decoder");
+	}
+
+	std::shared_ptr<AVCodecContext> avAudioCodec(avcodec_alloc_context3(codec),
+						     [](AVCodecContext* c) {
+							     avcodec_close(c);
+							     av_free(c);
+						     });
+
+	std::vector<uint8_t> codecContextExtraData(audioStream->codec->extradata,
+						   audioStream->codec->extradata + audioStream->codec->extradata_size);
+
+	avAudioCodec->extradata = reinterpret_cast<uint8_t *>(codecContextExtraData.data());
+	avAudioCodec->extradata_size = codecContextExtraData.size();
+
+	if (avcodec_open2(avAudioCodec.get(), codec, nullptr) < 0) {
+		throw std::runtime_error("Could not open the codec");
+	}
+	
 
 	ytst::Packet packet(avFormat.get());
 	do {
