@@ -9,10 +9,10 @@ namespace ytst {
 	struct Packet {
 		AVPacket packet;
 
-		explicit Packet(AVFormatContext* ctxt);
+		Packet();
 		Packet(Packet&& other);
 		~Packet();
-		void reset(AVFormatContext* ctxt);
+		void reset();
 	};
 }
 #endif

@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
 	auto avFormatPtr = avFormat.get();
 	
-	if (avformat_open_input(&avFormatPtr, "samples/out.aac", nullptr, nullptr) != 0) {
+	if (avformat_open_input(&avFormatPtr, "samples/in.aac", nullptr, nullptr) != 0) {
 		throw std::runtime_error("Error opening the file");
 	}
 
@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 	std::cout << "Codec ids found: " << std::endl;
 	for (unsigned int i = 0; i < avFormat->nb_streams; ++i) {
 		auto stream = avFormat->streams[i];
-		// auto codecType = stream->codec->codec_type;
+//		auto codecType = stream->codec->codec_type;
 		auto codecId = stream->codec->codec_id;
 		std::cout << codecId << std::endl;
 	}
@@ -57,32 +57,28 @@ int main(int argc, char **argv) {
 							     av_free(c);
 						     });
 
-	std::vector<uint8_t> codecContextExtraData(audioStream->codec->extradata,
-						   audioStream->codec->extradata + audioStream->codec->extradata_size);
+// 	std::vector<uint8_t> codecContextExtraData(audioStream->codec->extradata,
+// 						   audioStream->codec->extradata + audioStream->codec->extradata_size);
 
-	avAudioCodec->extradata = reinterpret_cast<uint8_t *>(codecContextExtraData.data());
-	avAudioCodec->extradata_size = codecContextExtraData.size();
+// 	avAudioCodec->extradata = reinterpret_cast<uint8_t *>(codecContextExtraData.data());
+// 	avAudioCodec->extradata_size = codecContextExtraData.size();
 
 	if (avcodec_open2(avAudioCodec.get(), codec, nullptr) < 0) {
 		throw std::runtime_error("Could not open the codec");
 	}
 
-	std::shared_ptr<AVFrame> avFrame(avcodec_alloc_frame(), &av_free);
-	ytst::Packet packet(avFormat.get());
+	std::shared_ptr<AVFrame> avFrame(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
+	ytst::Packet packet;
 	int offsetInData = 0;
+	FILE* out = fopen("out.pcm", "wb");
+	if (!out) {
+		throw std::runtime_error("Could not open out file");
+	}
 
-	while (true) {
-		if (offsetInData >= packet.packet.size) {
-			do {
-				packet.reset(avFormat.get());
-				if (packet.packet.stream_index != audioStream->index) {
-					continue;
-				}
-			} while (0);
+	while (av_read_frame(avFormat.get(), &packet.packet) >= 0) {
+		if (packet.packet.stream_index != audioStream->index) {
+			continue;
 		}
-		AVPacket packetToSend;
-		packetToSend.data = packet.packet.data + offsetInData;
-		packetToSend.size = packet.packet.size - offsetInData;
 
 		int isFrameAvailable = 0;
 		const auto processedLength = avcodec_decode_audio4(avAudioCodec.get(),
@@ -93,9 +89,17 @@ int main(int argc, char **argv) {
 			throw std::runtime_error("Error while processing data");
 		}
 
+		int frame_size = av_samples_get_buffer_size(nullptr,
+							    avAudioCodec.get()->channels,
+							    avFrame.get()->nb_samples,
+							    avAudioCodec.get()->sample_fmt,
+							    1);
+
+		fwrite(avFrame->data[0], 1, frame_size, out);
 		offsetInData += processedLength;
 	}
 
 
+	fclose(out); //Not exception safe
 	return 0;
 }
