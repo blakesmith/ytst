@@ -10,7 +10,7 @@ extern "C" {
 
 #include "Packet.hpp"
 
-int main(int argc, char **argv) {
+static int decode_audio(const char *infile, const char *outfile) {
 	static std::once_flag initFlag;
 	std::call_once(initFlag, []() { av_register_all(); });
 
@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
 
 	auto avFormatPtr = avFormat.get();
 	
-	if (avformat_open_input(&avFormatPtr, "samples/in.aac", nullptr, nullptr) != 0) {
+	if (avformat_open_input(&avFormatPtr, infile, nullptr, nullptr) != 0) {
 		throw std::runtime_error("Error opening the file");
 	}
 
@@ -70,7 +70,7 @@ int main(int argc, char **argv) {
 	std::shared_ptr<AVFrame> avFrame(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
 	ytst::Packet packet;
 	int offsetInData = 0;
-	FILE* out = fopen("out.pcm", "wb");
+	FILE* out = fopen(outfile, "wb");
 	if (!out) {
 		throw std::runtime_error("Could not open out file");
 	}
@@ -101,5 +101,10 @@ int main(int argc, char **argv) {
 
 
 	fclose(out); //Not exception safe
+
 	return 0;
+}
+
+int main(int argc, char **argv) {
+	return decode_audio("samples/in.aac", "out.pcm");
 }
