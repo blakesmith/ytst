@@ -71,12 +71,17 @@ static int decode_audio(const char *infile, const char *outfile) {
 	ytst::Packet packet;
 	int offsetInData = 0;
 	FILE* out = fopen(outfile, "wb");
+
 	if (!out) {
 		throw std::runtime_error("Could not open out file");
 	}
 
+
+	int planar = av_sample_fmt_is_planar(avAudioCodec->sample_fmt);
+	std::cout << "Planar: " << planar << std::endl;
 	while (av_read_frame(avFormat.get(), &packet.packet) >= 0) {
 		if (packet.packet.stream_index != audioStream->index) {
+			std::cout << "Yup" << std::endl;
 			continue;
 		}
 
@@ -86,16 +91,28 @@ static int decode_audio(const char *infile, const char *outfile) {
 								   &isFrameAvailable,
 								   &packet.packet);
 		if (processedLength < 0) {
+			std::cout << processedLength << std::endl;
 			throw std::runtime_error("Error while processing data");
 		}
 
-		int frame_size = av_samples_get_buffer_size(nullptr,
-							    avAudioCodec.get()->channels,
-							    avFrame.get()->nb_samples,
-							    avAudioCodec.get()->sample_fmt,
-							    1);
+		if (isFrameAvailable) {
+			int plane_size;
+			int frame_size = av_samples_get_buffer_size(&plane_size,
+								    avAudioCodec.get()->channels,
+								    avFrame.get()->nb_samples,
+								    avAudioCodec.get()->sample_fmt,
+								    1);
 
-		fwrite(avFrame->data[0], 1, frame_size, out);
+
+			if (planar) {
+				for (int ch = 0; ch < avAudioCodec.get()->channels; ch++) {
+					fwrite(avFrame->extended_data[ch], 1, avFrame->linesize[ch], out);
+				}
+			} else {
+				fwrite(avFrame->extended_data[0], 1, frame_size, out);
+			}
+		}
+
 		offsetInData += processedLength;
 	}
 
@@ -106,5 +123,5 @@ static int decode_audio(const char *infile, const char *outfile) {
 }
 
 int main(int argc, char **argv) {
-	return decode_audio("samples/in.aac", "out.pcm");
+	return decode_audio("samples/goose.mp3", "out.sw");
 }
