@@ -10,22 +10,14 @@ extern "C" {
 
 #include "Packet.hpp"
 
-static int decode_audio(const char *infile, const char *outfile) {
+static void init() {
 	static std::once_flag initFlag;
+
 	std::call_once(initFlag, []() { av_register_all(); });
+}
 
-	std::shared_ptr<AVFormatContext> avFormat(avformat_alloc_context(), &avformat_free_context);
-
-	auto avFormatPtr = avFormat.get();
-	
-	if (avformat_open_input(&avFormatPtr, infile, nullptr, nullptr) != 0) {
-		throw std::runtime_error("Error opening the file");
-	}
-
-	if (avformat_find_stream_info(avFormat.get(), nullptr) < 0) {
-		throw std::runtime_error("Error finding stream info");
-	}
-
+static int decode_audio(std::shared_ptr<AVFormatContext> avFormatPtr, FILE* out) {
+	auto avFormat = avFormatPtr.get();
 	std::cout << "Codec ids found: " << std::endl;
 	for (unsigned int i = 0; i < avFormat->nb_streams; ++i) {
 		auto stream = avFormat->streams[i];
@@ -57,12 +49,6 @@ static int decode_audio(const char *infile, const char *outfile) {
 							     av_free(c);
 						     });
 
-// 	std::vector<uint8_t> codecContextExtraData(audioStream->codec->extradata,
-// 						   audioStream->codec->extradata + audioStream->codec->extradata_size);
-
-// 	avAudioCodec->extradata = reinterpret_cast<uint8_t *>(codecContextExtraData.data());
-// 	avAudioCodec->extradata_size = codecContextExtraData.size();
-
 	if (avcodec_open2(avAudioCodec.get(), codec, nullptr) < 0) {
 		throw std::runtime_error("Could not open the codec");
 	}
@@ -70,7 +56,6 @@ static int decode_audio(const char *infile, const char *outfile) {
 	std::shared_ptr<AVFrame> avFrame(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
 	ytst::Packet packet;
 	int offsetInData = 0;
-	FILE* out = fopen(outfile, "wb");
 
 	if (!out) {
 		throw std::runtime_error("Could not open out file");
@@ -79,7 +64,8 @@ static int decode_audio(const char *infile, const char *outfile) {
 
 	int planar = av_sample_fmt_is_planar(avAudioCodec->sample_fmt);
 	std::cout << "Planar: " << planar << std::endl;
-	while (av_read_frame(avFormat.get(), &packet.packet) >= 0) {
+	std::cout << "Sample fmt: " << avAudioCodec->sample_fmt << std::endl;
+	while (av_read_frame(avFormat, &packet.packet) >= 0) {
 		if (packet.packet.stream_index != audioStream->index) {
 			std::cout << "Yup" << std::endl;
 			continue;
@@ -117,11 +103,35 @@ static int decode_audio(const char *infile, const char *outfile) {
 	}
 
 
-	fclose(out); //Not exception safe
 
 	return 0;
 }
 
+static std::shared_ptr<AVFormatContext> read_file(const char* infile) {
+	std::shared_ptr<AVFormatContext> avFormat(avformat_alloc_context(), &avformat_free_context);
+
+	auto avFormatPtr = avFormat.get();
+
+	if (avformat_open_input(&avFormatPtr, infile, nullptr, nullptr) != 0) {
+		throw std::runtime_error("Error opening the file");
+	}
+
+	if (avformat_find_stream_info(avFormat.get(), nullptr) < 0) {
+		throw std::runtime_error("Error finding stream info");
+	}
+
+	return avFormat;
+}
+
 int main(int argc, char **argv) {
-	return decode_audio("samples/goose.mp3", "out.sw");
+	init();
+
+	const char* infile = "samples/goose.mp3";
+	const char* outfile = "out.sw";
+
+	auto avFormat = read_file(infile);
+	FILE* out = fopen(outfile, "wb");
+
+	decode_audio(avFormat, out);
+	fclose(out);
 }
