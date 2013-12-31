@@ -35,7 +35,7 @@ namespace ytst {
 		int has_output, ret;
 		ret = avcodec_encode_audio2(encoder_context.get(),
 					    &packet.packet,
-					    nullptr,
+					    frame,
 					    &has_output);
 
 		if (ret < 0) {
