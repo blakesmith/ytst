@@ -6,8 +6,9 @@
 
 int main(int argc, char **argv) {
 	const char* infile = "samples/goose.mp3";
+//	const char* infile = "samples/in.aac";
 //	const char* outfile = "out.sw";
-	const char* outfile = "out.mp2";
+	const char* outfile = "out.mp3";
 
 	ytst::Decoder decoder(infile);
 	auto decoder_ctxt = decoder.read_file();
