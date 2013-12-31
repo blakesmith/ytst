@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "Packet.hpp"
+
 extern "C" {
 #include <libavformat/avformat.h>
 }
@@ -14,6 +16,7 @@ namespace ytst {
 		std::shared_ptr<AVCodecContext> avAudioCodec;
 		std::shared_ptr<AVFrame> avFrame;
 
+		Packet packet;
 		AVStream* audioStream;
 
 	public:

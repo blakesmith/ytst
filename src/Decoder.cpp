@@ -3,7 +3,6 @@
 #include <mutex>
 #include <memory>
 
-#include "Packet.hpp"
 #include "Decoder.hpp"
 
 namespace ytst {
@@ -70,7 +69,6 @@ namespace ytst {
 
 	AVFrame* Decoder::decode_frame() {
 		auto avFormatPtr = avFormat.get();
-		ytst::Packet packet;
 
 		while (true) {
 			int readFrame = av_read_frame(avFormatPtr, &packet.packet);

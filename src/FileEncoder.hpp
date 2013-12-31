@@ -13,6 +13,7 @@ namespace ytst {
 		std::shared_ptr<AVCodecContext> decoder_context;
 	public:
 		FileEncoder(std::shared_ptr<AVCodecContext> decoder_ctxt, FILE* outfile);
+		void open_encoder();
 		int encode_frame(AVFrame* frame);
 	};
 }

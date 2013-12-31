@@ -1,13 +1,14 @@
 #include <stdio.h>
 
 #include "FileEncoder.hpp"
-#include "Packet.hpp"
 
 namespace ytst {
 	FileEncoder::FileEncoder(std::shared_ptr<AVCodecContext> ctxt, FILE* outfile) {
 		this->out = outfile;
 		this->decoder_context = ctxt;
 	}
+
+	void open_encoder() {}
 
 	int FileEncoder::encode_frame(AVFrame* frame) {
 		int plane_size;
