@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <iostream>
-#include <mutex>
-#include <memory>
+#include <stdio.h>
 
 #include "Decoder.hpp"
 

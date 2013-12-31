@@ -1,6 +1,8 @@
 #ifndef YTST_DECODER_HPP
 #define YTST_DECODER_HPP
 
+#include <memory>
+
 extern "C" {
 #include <libavformat/avformat.h>
 }
