@@ -1,14 +1,23 @@
 #include <stdio.h>
 
 #include "Decoder.hpp"
+#include "FileEncoder.hpp"
 
 int main(int argc, char **argv) {
 	const char* infile = "samples/goose.mp3";
 	const char* outfile = "out.sw";
 
-	ytst::Decoder decoder;
+	ytst::Decoder decoder(infile);
+	auto ctxt = decoder.read_file();
+
 
 	FILE* out = fopen(outfile, "wb");
-	decoder.decode_audio(infile, out);
+	ytst::FileEncoder encoder(ctxt, out);
+
+	AVFrame* frame;
+	while ((frame = decoder.decode_frame()) != nullptr) {
+		encoder.encode_frame(frame);
+	}
+
 	fclose(out);
 }

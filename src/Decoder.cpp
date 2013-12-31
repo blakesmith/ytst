@@ -7,13 +7,15 @@
 #include "Decoder.hpp"
 
 namespace ytst {
-	Decoder::Decoder() {
+	Decoder::Decoder(const char* infile) {
 		static std::once_flag initFlag;
 		std::call_once(initFlag, []() { av_register_all(); });
-		avFormat = std::shared_ptr<AVFormatContext>(avformat_alloc_context(), &avformat_free_context);
+		this->infile = infile;
+		audioStream = nullptr;
 	}
 
-	void Decoder::read_file(const char* infile) {
+	std::shared_ptr<AVCodecContext> Decoder::read_file() {
+		avFormat = std::shared_ptr<AVFormatContext>(avformat_alloc_context(), &avformat_free_context);
 		auto avFormatPtr = avFormat.get();
 
 		if (avformat_open_input(&avFormatPtr, infile, nullptr, nullptr) != 0) {
@@ -23,11 +25,6 @@ namespace ytst {
 		if (avformat_find_stream_info(avFormat.get(), nullptr) < 0) {
 			throw std::runtime_error("Error finding stream info");
 		}
-	}
-
-	int Decoder::decode_audio(const char* infile, FILE* out) {
-		auto avFormatPtr = avFormat.get();
-		this->read_file(infile);
 
 		std::cout << "Codec ids found: " << std::endl;
 		for (unsigned int i = 0; i < avFormatPtr->nb_streams; ++i) {
@@ -36,7 +33,6 @@ namespace ytst {
 			std::cout << codecId << std::endl;
 		}
 
-		AVStream *audioStream = nullptr;
 		for (unsigned int i = 0; i < avFormatPtr->nb_streams; ++i) {
 			if (avFormatPtr->streams[i]->codec->codec_type == AVMEDIA_TYPE_AUDIO) {
 				audioStream = avFormatPtr->streams[i];
@@ -53,66 +49,56 @@ namespace ytst {
 			throw std::runtime_error("Could not find a suitable audio decoder");
 		}
 
-		std::shared_ptr<AVCodecContext> avAudioCodec(avcodec_alloc_context3(codec),
-							     [](AVCodecContext* c) {
-								     avcodec_close(c);
-								     av_free(c);
-							     });
+		avAudioCodec = std::shared_ptr<AVCodecContext>(avcodec_alloc_context3(codec),
+							       [](AVCodecContext* c) {
+								       avcodec_close(c);
+								       av_free(c);
+							       });
 
 		if (avcodec_open2(avAudioCodec.get(), codec, nullptr) < 0) {
 			throw std::runtime_error("Could not open the codec");
 		}
 
-		std::shared_ptr<AVFrame> avFrame(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
-		ytst::Packet packet;
-		int offsetInData = 0;
-
-		if (!out) {
-			throw std::runtime_error("Could not open out file");
-		}
-
-
 		int planar = av_sample_fmt_is_planar(avAudioCodec->sample_fmt);
 		std::cout << "Planar: " << planar << std::endl;
 		std::cout << "Sample fmt: " << avAudioCodec->sample_fmt << std::endl;
-		while (av_read_frame(avFormatPtr, &packet.packet) >= 0) {
+
+		avFrame = std::shared_ptr<AVFrame>(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
+
+		return avAudioCodec;
+	}
+
+	AVFrame* Decoder::decode_frame() {
+		auto avFormatPtr = avFormat.get();
+		ytst::Packet packet;
+
+		while (true) {
+			int readFrame = av_read_frame(avFormatPtr, &packet.packet);
+			if (readFrame < 0) {
+				return nullptr;
+			}
+		
 			if (packet.packet.stream_index != audioStream->index) {
 				continue;
+			} else {
+				break;
 			}
-
-			int isFrameAvailable = 0;
-			const auto processedLength = avcodec_decode_audio4(avAudioCodec.get(),
-									   avFrame.get(),
-									   &isFrameAvailable,
-									   &packet.packet);
-			if (processedLength < 0) {
-				std::cout << processedLength << std::endl;
-				throw std::runtime_error("Error while processing data");
-			}
-
-			if (isFrameAvailable) {
-				int plane_size;
-				int frame_size = av_samples_get_buffer_size(&plane_size,
-									    avAudioCodec.get()->channels,
-									    avFrame.get()->nb_samples,
-									    avAudioCodec.get()->sample_fmt,
-									    1);
-
-
-				if (planar) {
-					for (int ch = 0; ch < avAudioCodec.get()->channels; ch++) {
-						fwrite(avFrame->extended_data[ch], 1, avFrame->linesize[ch], out);
-					}
-				} else {
-					fwrite(avFrame->extended_data[0], 1, frame_size, out);
-				}
-			}
-
-			offsetInData += processedLength;
 		}
 
+		int isFrameAvailable = 0;
+		const auto processedLength = avcodec_decode_audio4(avAudioCodec.get(),
+								   avFrame.get(),
+								   &isFrameAvailable,
+								   &packet.packet);
+		if (processedLength < 0) {
+			throw std::runtime_error("Error while processing data");
+		}
 
+		if (isFrameAvailable) {
+			return avFrame.get();
+		}
 
-		return 0;
+		// Should never reach here
+		return nullptr;
 	}
 }

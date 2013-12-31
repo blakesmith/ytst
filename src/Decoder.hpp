@@ -9,12 +9,17 @@ extern "C" {
 
 namespace ytst {
 	class Decoder {
+		const char* infile;
 		std::shared_ptr<AVFormatContext> avFormat;
+		std::shared_ptr<AVCodecContext> avAudioCodec;
+		std::shared_ptr<AVFrame> avFrame;
 
-		void read_file(const char* infile);
+		AVStream* audioStream;
+
 	public:
-		Decoder();
-		int decode_audio(const char* infile, FILE* out);
+		Decoder(const char* infile);
+		std::shared_ptr<AVCodecContext> read_file();
+		AVFrame* decode_frame();
 	};
 }
 
