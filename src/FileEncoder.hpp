@@ -10,9 +10,9 @@ extern "C" {
 namespace ytst {
 	class FileEncoder {
 		FILE* out;
-		std::shared_ptr<AVCodecContext> context;
+		std::shared_ptr<AVCodecContext> decoder_context;
 	public:
-		FileEncoder(std::shared_ptr<AVCodecContext> ctxt, FILE* outfile);
+		FileEncoder(std::shared_ptr<AVCodecContext> decoder_ctxt, FILE* outfile);
 		int encode_frame(AVFrame* frame);
 	};
 }

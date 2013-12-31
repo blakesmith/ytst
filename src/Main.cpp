@@ -8,11 +8,10 @@ int main(int argc, char **argv) {
 	const char* outfile = "out.sw";
 
 	ytst::Decoder decoder(infile);
-	auto ctxt = decoder.read_file();
-
+	auto decoder_ctxt = decoder.read_file();
 
 	FILE* out = fopen(outfile, "wb");
-	ytst::FileEncoder encoder(ctxt, out);
+	ytst::FileEncoder encoder(decoder_ctxt, out);
 
 	AVFrame* frame;
 	while ((frame = decoder.decode_frame()) != nullptr) {
