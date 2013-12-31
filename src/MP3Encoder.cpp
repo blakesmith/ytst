@@ -8,7 +8,7 @@ namespace ytst {
 	}
 
 	void MP3Encoder::open_encoder() {
-		const auto codec = avcodec_find_encoder(AV_CODEC_ID_MP2);
+		const auto codec = avcodec_find_encoder(AV_CODEC_ID_MP3);
 		
 		if (codec == nullptr) {
 			throw std::runtime_error("Could not find a suitable audio encoder");
@@ -20,7 +20,7 @@ namespace ytst {
 									  av_free(c);
 								  });
 
-		encoder_context.get()->sample_fmt = AV_SAMPLE_FMT_S16;
+		encoder_context.get()->sample_fmt = AV_SAMPLE_FMT_S16P;
 		encoder_context.get()->bit_rate = 192000;
 		encoder_context.get()->sample_rate = select_sample_rate(codec);
 		encoder_context.get()->channel_layout = select_channel_layout(codec);
