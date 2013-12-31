@@ -8,7 +8,7 @@ namespace ytst {
 		this->decoder_context = ctxt;
 	}
 
-	void open_encoder() {}
+	void FileEncoder::open_encoder() {}
 
 	int FileEncoder::encode_frame(AVFrame* frame) {
 		int plane_size;

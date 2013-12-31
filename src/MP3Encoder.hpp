@@ -3,6 +3,8 @@
 
 #include <memory>
 
+#include "Packet.hpp"
+
 extern "C" {
 #include <libavformat/avformat.h>
 }
@@ -13,6 +15,10 @@ namespace ytst {
 		FILE* out;
 		std::shared_ptr<AVCodecContext> decoder_context;
 		std::shared_ptr<AVCodecContext> encoder_context;
+		Packet packet;
+
+		int select_sample_rate(AVCodec* codec);
+		int select_channel_layout(AVCodec* codec);
 	public:
 		MP3Encoder(std::shared_ptr<AVCodecContext> ctxt, FILE* outfile);
 		void open_encoder();
