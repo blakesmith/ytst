@@ -96,6 +96,9 @@ namespace ytst {
 
 		if (isFrameAvailable) {
 			return avFrame.get();
+		} else {
+			// Didn't get a frame, try reading again
+			return this->decode_frame();
 		}
 
 		// Should never reach here
