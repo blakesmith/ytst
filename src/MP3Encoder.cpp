@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "MP3Encoder.hpp"
 #include "Packet.hpp"
 
@@ -20,15 +22,17 @@ namespace ytst {
 									  av_free(c);
 								  });
 
-		encoder_context.get()->sample_fmt = AV_SAMPLE_FMT_S16P;
-		encoder_context.get()->bit_rate = 192000;
-		encoder_context.get()->sample_rate = select_sample_rate(codec);
+		encoder_context.get()->sample_fmt = decoder_context.get()->sample_fmt;
+		encoder_context.get()->bit_rate = 128000;
+		encoder_context.get()->sample_rate = 44100;
 		encoder_context.get()->channel_layout = select_channel_layout(codec);
 		encoder_context.get()->channels = av_get_channel_layout_nb_channels(encoder_context.get()->channel_layout);
 
 		if (avcodec_open2(encoder_context.get(), codec, nullptr) < 0) {
 			throw std::runtime_error("Could not open the codec");
 		}
+
+		std::cout << "Encoder frame size: " << encoder_context.get()->frame_size << std::endl;
 	}
 
 	int MP3Encoder::encode_frame(AVFrame* frame) {
@@ -63,6 +67,7 @@ namespace ytst {
 				written += res;
 			}
 
+			packet.reset();
 		}
 
 		return written;

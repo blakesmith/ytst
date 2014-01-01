@@ -64,6 +64,8 @@ namespace ytst {
 
 		avFrame = std::shared_ptr<AVFrame>(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
 
+		std::cout << "Decoder frame size: " << avAudioCodec->frame_size << std::endl;
+
 		return avAudioCodec;
 	}
 

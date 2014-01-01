@@ -20,6 +20,7 @@ namespace ytst {
 	void Packet::reset() {
 		if (packet.data) {
 			av_free_packet(&packet);
+			av_init_packet(&packet);
 			packet.data = nullptr;
 		}
 	}
