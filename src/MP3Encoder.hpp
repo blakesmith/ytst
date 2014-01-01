@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "Encoder.hpp"
 #include "Packet.hpp"
 
 extern "C" {
@@ -10,8 +11,8 @@ extern "C" {
 }
 
 namespace ytst {
-	// This with FileEncoder should extend from an Encoder abstract class
-	class MP3Encoder {
+// This with FileEncoder should extend from an Encoder abstract class
+	class MP3Encoder : Encoder {
 		FILE* out;
 		std::shared_ptr<AVCodecContext> decoder_context;
 		std::shared_ptr<AVCodecContext> encoder_context;

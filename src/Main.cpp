@@ -5,7 +5,7 @@
 #include "MP3Encoder.hpp"
 
 int main(int argc, char **argv) {
-	const char* infile = "samples/in.aac";
+	const char* infile = "samples/bangarang.mp4";
 //	const char* infile = "samples/in.aac";
 //	const char* outfile = "out.sw";
 	const char* outfile = "bangarang.mp3";

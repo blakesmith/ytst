@@ -3,12 +3,14 @@
 
 #include <memory>
 
+#include "Encoder.hpp"
+
 extern "C" {
 #include <libavformat/avformat.h>
 }
 
 namespace ytst {
-	class FileEncoder {
+	class FileEncoder : Encoder {
 		FILE* out;
 		std::shared_ptr<AVCodecContext> decoder_context;
 	public:
