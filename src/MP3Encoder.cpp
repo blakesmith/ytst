@@ -53,22 +53,7 @@ namespace ytst {
 			written += res;
 		}
 
-		has_output = 1;
-		while (has_output != 0) {
-			ret = avcodec_encode_audio2(encoder_context.get(),
-						    &packet.packet,
-						    nullptr,
-						    &has_output);
-			if (ret < 0) {
-				throw std::runtime_error("Error encoding delayed audio frames");
-			}
-			res = fwrite(packet.packet.data, 1, packet.packet.size, out);
-			if (res > 0) {
-				written += res;
-			}
-
-			packet.reset();
-		}
+		packet.reset();
 
 		return written;
 	}
