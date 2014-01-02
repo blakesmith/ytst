@@ -48,11 +48,11 @@ namespace ytst {
 			throw std::runtime_error("Could not find a suitable audio decoder");
 		}
 
-		avAudioCodec = std::shared_ptr<AVCodecContext>(avcodec_alloc_context3(codec),
+		avAudioCodec = std::shared_ptr<AVCodecContext>(audioStream->codec,
 							       [](AVCodecContext* c) {
 								       avcodec_close(c);
-								       av_free(c);
 							       });
+
 
 		if (avcodec_open2(avAudioCodec.get(), codec, nullptr) < 0) {
 			throw std::runtime_error("Could not open the codec");
@@ -86,10 +86,11 @@ namespace ytst {
 		}
 
 		int isFrameAvailable = 0;
-		const auto processedLength = avcodec_decode_audio4(avAudioCodec.get(),
-								   avFrame.get(),
-								   &isFrameAvailable,
-								   &packet.packet);
+		int processedLength = avcodec_decode_audio4(avAudioCodec.get(),
+							    avFrame.get(),
+							    &isFrameAvailable,
+							    &packet.packet);
+
 		if (processedLength < 0) {
 			throw std::runtime_error("Error while processing data");
 		}

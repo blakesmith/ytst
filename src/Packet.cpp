@@ -6,6 +6,7 @@
 namespace ytst {
 	Packet::Packet() {
 		av_init_packet(&packet);
+		packet.size = 0;
 		packet.data = nullptr;
 	}
 
@@ -18,10 +19,7 @@ namespace ytst {
 	}
 
 	void Packet::reset() {
-		if (packet.data) {
-			av_free_packet(&packet);
-			av_init_packet(&packet);
-			packet.data = nullptr;
-		}
+		av_free_packet(&packet);
+		packet.data = nullptr;
 	}
 }
