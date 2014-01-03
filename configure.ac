@@ -12,6 +12,8 @@ AC_CONFIG_MACRO_DIRS([m4])
 AC_PROG_CXX
 AX_CXX_COMPILE_STDCXX_11([noext],[mandatory])
 
+AX_PYTHON_DEVEL([">= 2.7.2"])
+
 # Checks for libraries.
 
 # Checks for header files.

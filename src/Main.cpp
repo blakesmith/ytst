@@ -5,11 +5,9 @@
 #include "MP3Encoder.hpp"
 
 int main(int argc, char **argv) {
-	const char* infile = "samples/bangarang.mp4";
-//	const char* infile = "samples/in.aac";
-//	const char* outfile = "out.sw";
-	const char* outfile = "bangarang.mp3";
-
+	const char* infile = "samples/bungle.mp4";
+	const char* outfile = "bungle.mp3";
+	
 	ytst::Decoder decoder(infile);
 	auto decoder_ctxt = decoder.read_file();
 
@@ -24,3 +22,4 @@ int main(int argc, char **argv) {
 
 	fclose(out);
 }
+
