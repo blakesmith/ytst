@@ -6,10 +6,10 @@
 #include "MP3Encoder.hpp"
 
 int main(int argc, char **argv) {
-	const char* infile = "samples/minor_happy.mp4";
-	const char* outfile = "minor_happy.mp3";
+	const char* infile = "samples/download.mp4";
+	const char* outfile = "download.mp3";
 
-	ytst::YTDownloader downloader("https://www.youtube.com/watch?v=Q4lVmfyD99k", "samples/download.mp4");
+	ytst::YTDownloader downloader("https://www.youtube.com/watch?v=UDgsfKIL8Sc", infile);
 	downloader.download();
 	
 	ytst::Decoder decoder(infile);

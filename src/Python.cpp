@@ -58,13 +58,17 @@ namespace ytst {
 	}
 
 	std::shared_ptr<PyObject> Python::make_arguments(std::vector<std::string> args) {
-		PyObject* list = PyTuple_New(args.size());
+		PyObject* tuple = PyTuple_New(1);
+		PyObject* list = PyList_New(args.size());
+
 		for (unsigned int i = 0; i < args.size(); ++i) {
 			PyObject* arg = PyString_FromString(args[i].c_str());
-			PyTuple_SetItem(list, i, arg);
+			PyList_SetItem(list, i, arg);
 		}
+		
+		PyTuple_SetItem(tuple, 0, list);
 
-		return std::shared_ptr<PyObject>(list,
+		return std::shared_ptr<PyObject>(tuple,
 						 [](PyObject* p) {
 							 Py_DECREF(p);
 						 });

@@ -12,13 +12,14 @@ namespace ytst {
 		this->download_url = url;
 		this->file_out = out;
 
-		python.add_path("/Users/blake/src/youtube-dl");
+		python.add_path("src/python/youtube-dl");
 	}
 
 	int YTDownloader::download() {
 		auto module = python.import_module("youtube_dl");
 
 		std::vector<std::string> func_args;
+		func_args.push_back("-q");
 		func_args.push_back("--no-part");
 		func_args.push_back("-o");
 		func_args.push_back(std::string(file_out, strlen(file_out)));
