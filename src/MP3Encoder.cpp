@@ -1,11 +1,9 @@
 #include <iostream>
 
 #include "MP3Encoder.hpp"
-#include "Packet.hpp"
 
 namespace ytst {
-	MP3Encoder::MP3Encoder(std::shared_ptr<AVCodecContext> ctxt, FILE* outfile) {
-		this->out = outfile;
+	MP3Encoder::MP3Encoder(std::shared_ptr<AVCodecContext> ctxt) {
 		this->decoder_context = ctxt;
 	}
 
@@ -35,7 +33,7 @@ namespace ytst {
 		std::cout << "Encoder frame size: " << encoder_context.get()->frame_size << std::endl;
 	}
 
-	int MP3Encoder::encode_frame(AVFrame* frame) {
+	int MP3Encoder::encode_frame(AVFrame* frame, Packet& packet) {
 		int has_output, ret;
 		ret = avcodec_encode_audio2(encoder_context.get(),
 					    &packet.packet,
@@ -46,16 +44,7 @@ namespace ytst {
 			throw std::runtime_error("Error encoding audio frame");
 		}
 
-		int written = 0;
-		int res;
-		res = fwrite(packet.packet.data, 1, packet.packet.size, out);
-		if (res > 0) {
-			written += res;
-		}
-
-		packet.reset();
-
-		return written;
+		return ret;
 	}
 
 	/* just pick the highest supported samplerate */

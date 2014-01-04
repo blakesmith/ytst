@@ -2,8 +2,9 @@
 
 #include "YTDownloader.hpp"
 #include "Decoder.hpp"
-#include "FileEncoder.hpp"
+#include "FileWriter.hpp"
 #include "MP3Encoder.hpp"
+#include "Packet.hpp"
 
 int main(int argc, char **argv) {
 	const char* infile = "samples/download.mp4";
@@ -16,14 +17,17 @@ int main(int argc, char **argv) {
 	auto decoder_ctxt = decoder.read_file();
 
 	FILE* out = fopen(outfile, "wb");
-	ytst::MP3Encoder encoder(decoder_ctxt, out);
+	ytst::MP3Encoder encoder(decoder_ctxt);
 	encoder.open_encoder();
 
-	AVFrame* frame;
-	while ((frame = decoder.decode_frame()) != nullptr) {
-		encoder.encode_frame(frame);
-	}
+	ytst::FileWriter writer(out);
 
-	fclose(out);
+	AVFrame* frame;
+	ytst::Packet packet;
+	while ((frame = decoder.decode_frame()) != nullptr) {
+		encoder.encode_frame(frame, packet);
+		writer.write_packet(packet);
+		packet.reset();
+	}
 }
 

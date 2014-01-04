@@ -12,17 +12,15 @@ extern "C" {
 
 namespace ytst {
 	class MP3Encoder : Encoder {
-		FILE* out;
 		std::shared_ptr<AVCodecContext> decoder_context;
 		std::shared_ptr<AVCodecContext> encoder_context;
-		Packet packet;
 
 		int select_sample_rate(AVCodec* codec);
 		int select_channel_layout(AVCodec* codec);
 	public:
-		MP3Encoder(std::shared_ptr<AVCodecContext> ctxt, FILE* outfile);
+		MP3Encoder(std::shared_ptr<AVCodecContext> ctxt);
 		void open_encoder();
-		int encode_frame(AVFrame* frame);
+		int encode_frame(AVFrame* frame, Packet& packet);
 	};
 }
 #endif
