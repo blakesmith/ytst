@@ -15,7 +15,11 @@ namespace ytst {
 	void Python::add_path(const char* path) {
 		PyObject* sys = PyImport_ImportModule("sys");
 		PyObject* pPath = PyObject_GetAttrString(sys, "path");
-		PyList_Append(pPath, PyString_FromString(path));
+		PyObject* new_path = PyString_FromString(path);
+		PyList_Append(pPath, new_path);
+		Py_DECREF(sys);
+		Py_DECREF(pPath);
+		Py_DECREF(new_path);
 	}
 
 	std::shared_ptr<PyObject> Python::import_module(const char* module) {
