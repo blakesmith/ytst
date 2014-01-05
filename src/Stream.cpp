@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "YTDownloader.hpp"
 #include "Decoder.hpp"
 #include "FileWriter.hpp"
@@ -15,8 +17,10 @@ namespace ytst {
 		std::string infile = fifo_location();
 
 		auto url = youtube_url(id);
-		ytst::YTDownloader downloader(url, infile);
-		downloader.download();
+		std::thread dt([=] { 
+				ytst::YTDownloader downloader(url, infile);
+				downloader.download();
+			});
 	
 		ytst::Decoder decoder(infile);
 		auto decoder_ctxt = decoder.read_file();
@@ -35,6 +39,8 @@ namespace ytst {
 			writer.write_packet(packet);
 			packet.reset();
 		}
+
+		dt.join();
 	}
 
 	std::string Stream::youtube_url(std::string id) {
