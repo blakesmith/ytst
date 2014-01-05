@@ -17,8 +17,7 @@ namespace ytst {
 		std::string infile = fifo_location();
 		std::string url = youtube_url(id);
 
-		ytst::Stream::Fifo fifo;
-		fifo.create(infile);
+		ytst::Stream::Fifo fifo(infile);
 
 		std::thread dt([=] { 
 				ytst::YTDownloader downloader(url, infile);

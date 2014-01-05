@@ -20,7 +20,7 @@ namespace ytst {
 		class Fifo {
 			std::string path;
 		public:
-			void create(std::string path) {
+			Fifo(std::string path) {
 				this->path = path;
 				if (mkfifo(path.c_str(), 0644) < 0) {
 					throw std::runtime_error("Error making named pipe");
