@@ -15,8 +15,11 @@ namespace ytst {
 
 	void Stream::stream(std::string id) {
 		std::string infile = fifo_location();
+		std::string url = youtube_url(id);
 
-		auto url = youtube_url(id);
+		ytst::Stream::Fifo fifo;
+		fifo.create(infile);
+
 		std::thread dt([=] { 
 				ytst::YTDownloader downloader(url, infile);
 				downloader.download();
