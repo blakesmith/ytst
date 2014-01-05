@@ -7,10 +7,8 @@
 /config.status
 /configure
 /libtool
-samples/*.mp4
-samples/*.mp3
-samples/*.mp2
-samples/*.aac
+*.mp*
+*.aac
 src/Makefile
 src/ytst
 Makefile.in
