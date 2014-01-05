@@ -1,6 +1,7 @@
 #ifndef YTST_DECODER_HPP
 #define YTST_DECODER_HPP
 
+#include <string>
 #include <memory>
 
 #include "Packet.hpp"
@@ -11,7 +12,7 @@ extern "C" {
 
 namespace ytst {
 	class Decoder {
-		const char* infile;
+		std::string infile;
 		std::shared_ptr<AVFormatContext> avFormat;
 		std::shared_ptr<AVCodecContext> avAudioCodec;
 		std::shared_ptr<AVFrame> avFrame;
@@ -20,7 +21,7 @@ namespace ytst {
 		AVStream* audioStream;
 
 	public:
-		Decoder(const char* infile);
+		Decoder(std::string infile);
 		std::shared_ptr<AVCodecContext> read_file();
 		AVFrame* decode_frame();
 	};

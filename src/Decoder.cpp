@@ -6,7 +6,7 @@
 #include "Decoder.hpp"
 
 namespace ytst {
-	Decoder::Decoder(const char* infile) {
+	Decoder::Decoder(std::string infile) {
 		static std::once_flag initFlag;
 		std::call_once(initFlag, []() { av_register_all(); });
 		this->infile = infile;
@@ -17,7 +17,7 @@ namespace ytst {
 		avFormat = std::shared_ptr<AVFormatContext>(avformat_alloc_context(), &avformat_free_context);
 		auto avFormatPtr = avFormat.get();
 
-		if (avformat_open_input(&avFormatPtr, infile, nullptr, nullptr) != 0) {
+		if (avformat_open_input(&avFormatPtr, infile.c_str(), nullptr, nullptr) != 0) {
 			throw std::runtime_error("Error opening the file");
 		}
 

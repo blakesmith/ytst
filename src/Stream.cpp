@@ -18,7 +18,7 @@ namespace ytst {
 		ytst::YTDownloader downloader(url, infile);
 		downloader.download();
 	
-		ytst::Decoder decoder(infile.c_str());
+		ytst::Decoder decoder(infile);
 		auto decoder_ctxt = decoder.read_file();
 
 		ytst::MP3Encoder encoder(decoder_ctxt);
