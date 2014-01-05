@@ -1,16 +1,14 @@
 #include <mutex>
-#include <cstring>
 #include <vector>
-#include <string>
 
 #include "YTDownloader.hpp"
 
 #include "Python.h"
 
 namespace ytst {
-	YTDownloader::YTDownloader(const char* url, const char* out) {
-		this->download_url = url;
-		this->file_out = out;
+	YTDownloader::YTDownloader(std::string url, std::string out) {
+		this->url = url;
+		this->out = out;
 
 		python.add_path("src/python/youtube-dl");
 	}
@@ -22,8 +20,8 @@ namespace ytst {
 		func_args.push_back("-q");
 		func_args.push_back("--no-part");
 		func_args.push_back("-o");
-		func_args.push_back(std::string(file_out, strlen(file_out)));
-		func_args.push_back(std::string(download_url, strlen(download_url)));
+		func_args.push_back(out);
+		func_args.push_back(url);
 
 		auto result = python.call_func(module.get(), "_real_main", func_args);
 		return 0;

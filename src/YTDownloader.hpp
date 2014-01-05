@@ -1,16 +1,18 @@
 #ifndef YTST_YT_DOWNLOADER_HPP
 #define YTST_YT_DOWNLOADER_HPP
 
+#include <string>
+
 #include "Python.hpp"
 
 namespace ytst {
 	class YTDownloader {
-		const char* download_url;
-		const char* file_out;
+		std::string url;
+		std::string out;
 
 		Python python;
 	public:
-		YTDownloader(const char* url, const char* out);
+		YTDownloader(std::string url, std::string out);
 		int download();
 	};
 }

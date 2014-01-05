@@ -15,7 +15,7 @@ namespace ytst {
 		std::string infile = fifo_location();
 
 		auto url = youtube_url(id);
-		ytst::YTDownloader downloader(url.c_str(), infile.c_str());
+		ytst::YTDownloader downloader(url, infile);
 		downloader.download();
 	
 		ytst::Decoder decoder(infile.c_str());
