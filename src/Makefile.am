@@ -1,12 +1,13 @@
 RAGEL=ragel
 AM_CXXFLAGS=$(LIBEV_CFLAGS) $(ffmpeg_CFLAGS) $(PYTHON_CPPFLAGS) $(PTHREAD_CFLAGS) -Wall -pedantic
 bin_PROGRAMS=ytst
-ytst_SOURCES=Main.cpp Encoder.hpp Packet.hpp Packet.cpp Decoder.hpp Decoder.cpp FileWriter.hpp FileWriter.cpp MP3Encoder.hpp MP3Encoder.cpp YTDownloader.hpp YTDownloader.cpp Python.hpp Python.cpp Stream.hpp Stream.cpp CmdOpt.hpp CmdOpt.cpp
+ytst_C_SOURCES = http11_parser.h http11_parser.c
+ytst_SOURCES=$(ytst_C_SOURCES) Main.cpp Encoder.hpp Packet.hpp Packet.cpp Decoder.hpp Decoder.cpp FileWriter.hpp FileWriter.cpp MP3Encoder.hpp MP3Encoder.cpp YTDownloader.hpp YTDownloader.cpp Python.hpp Python.cpp Stream.hpp Stream.cpp CmdOpt.hpp CmdOpt.cpp
 ytst_LDADD=$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS)
 
-http11/http11_parser.c:
-	$(RAGEL) http11/http11_parser.rl
+http11_parser.c:
+	$(RAGEL) http11_parser.rl
 
-clean-local:
-	rm -rf http/http11_parser.c
+clean-http:
+	rm -rf http11_parser.c
 

@@ -1,5 +1,0 @@
-ragel: http11_parser.c
-
-http11_parser.c:
-	$(RAGEL) http11_parser.rl
-
