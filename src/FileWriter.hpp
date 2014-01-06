@@ -13,6 +13,7 @@ namespace ytst {
 	public:
 		FileWriter(FILE* out);
 		virtual int write_packet(Packet& packet);
+		virtual Buffer* get_buffer();
 	};
 }
 

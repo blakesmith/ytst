@@ -13,4 +13,8 @@ namespace ytst {
 
 		return res;
 	}
+
+	Buffer* FileWriter::get_buffer() {
+		return nullptr;
+	}
 }
