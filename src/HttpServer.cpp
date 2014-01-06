@@ -6,6 +6,8 @@
 
 namespace ytst {
 	void HttpServer::io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {
+		HttpServer* impl = (HttpServer *)watcher->data;
+
 		if (EV_ERROR & revents) {
 			perror("Got invalid event.\n");
 			return;
@@ -20,7 +22,7 @@ namespace ytst {
 			return;
 		}
 
-		new HttpClient(loop, client_sd);
+		new HttpClient(impl->options->fifo_directory, impl->python, loop, client_sd);
 	}
 
 	void HttpServer::signal_cb(struct ev_loop *loop, ev_signal *signal, int revents) {
@@ -31,7 +33,13 @@ namespace ytst {
 		ev_loop(loop, 0);
 	}
 
-	HttpServer::HttpServer(int port) {
+	HttpServer::HttpServer(Options* options) : options(options) {
+		int port = 8192;
+
+		ytst::Python* py = new ytst::Python;
+		python = std::shared_ptr<Python>(py);
+		python.get()->add_path(options->python_path.c_str());
+
 		printf("Listening on port %d\n", port);
 
 		struct sockaddr_in addr;
@@ -51,6 +59,8 @@ namespace ytst {
 		listen(s, 5);
 
 		loop = ev_default_loop(0);
+
+		io.data = (void *)this;
 
 		ev_io_init(&io, HttpServer::io_accept, s, EV_READ);
 		ev_io_start(loop, &io);

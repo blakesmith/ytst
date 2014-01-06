@@ -4,6 +4,10 @@
 #include <ev++.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <memory>
+
+#include "CmdOpt.hpp"
+#include "Python.hpp"
 
 namespace ytst {
 	class HttpServer {
@@ -11,12 +15,14 @@ namespace ytst {
 		struct ev_io io;
 		struct ev_signal sio;
 		struct ev_loop *loop;
+		Options* options;
+		std::shared_ptr<ytst::Python> python;
 		int s;
 	public:
 		static void io_accept(struct ev_loop *loop, ev_io *watcher, int revents);
 		static void signal_cb(struct ev_loop *loop, ev_signal *signal, int revents);
 		void start();
-		HttpServer(int port);
+		HttpServer(Options* options);
 		~HttpServer();
 	};
 }
