@@ -129,6 +129,7 @@ namespace ytst {
 				ev_async_send(loop, &notify);
 			});
 
+		LOG(logINFO) << "Starting stream thread";
 		stream_thread = std::thread([=] {
 				ytst::Stream stream(this->fifo_directory,
 						    this->python, 

@@ -31,20 +31,23 @@ namespace ytst {
 
 		ytst::Stream::Fifo fifo(infile);
 
+		LOG(logINFO) << "Starting video download";
 		std::thread dt([=] { 
 				ytst::YTDownloader downloader(url, infile, python);
 				downloader.download();
 			});
-	
+
+		LOG(logINFO) << "Starting decoder";
 		ytst::Decoder decoder(infile);
 		auto decoder_ctxt = decoder.read_file();
 
+		LOG(logINFO) << "Starting encoder";
 		ytst::MP3Encoder encoder(decoder_ctxt);
 		encoder.open_encoder();
 
 		AVFrame* frame;
 		ytst::Packet packet;
-		LOG(logINFO) << "Started decoding";
+		LOG(logINFO) << "Begin decoding";
 		while ((frame = decoder.decode_frame()) != nullptr) {
 			encoder.encode_frame(frame, packet);
 			writer->write_packet(packet);
@@ -55,12 +58,12 @@ namespace ytst {
 	}
 
 	std::string Stream::youtube_url(std::string id) {
-		return (std::string("https://www.youtube.com/watch?v=") + id);
+		return std::string("https://www.youtube.com/watch?v=") + id;
 	}
 
 	std::string Stream::fifo_location() {
 		// XXX: Not OS independent!
-		return (fifo_directory + "/" + stream_id() + ".mp4");
+		return std::string(fifo_directory + "/" + stream_id() + ".mp4");
 	}
 	
 	std::string Stream::stream_id() {

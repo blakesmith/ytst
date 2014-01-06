@@ -18,6 +18,7 @@ namespace ytst {
 		avFormat = std::shared_ptr<AVFormatContext>(avformat_alloc_context(), &avformat_free_context);
 		auto avFormatPtr = avFormat.get();
 
+		LOG(logINFO) << "Opening format";
 		if (avformat_open_input(&avFormatPtr, infile.c_str(), nullptr, nullptr) != 0) {
 			throw std::runtime_error("Error opening the file");
 		}

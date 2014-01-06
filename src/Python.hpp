@@ -11,6 +11,7 @@ extern "C" {
 
 namespace ytst {
 	class Python {
+		PyGILState_STATE gil;
 		std::shared_ptr<PyObject> make_arguments(std::vector<std::string> args);
 	public:
 		Python();
