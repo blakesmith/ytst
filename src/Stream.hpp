@@ -1,6 +1,7 @@
 #ifndef YTST_STREAM_HPP
 #define YTST_STREAM_HPP
 
+#include <memory>
 #include <string>
 #include <cstdio>
 #include <stdexcept>
@@ -9,9 +10,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "Python.hpp"
+
 namespace ytst {
 	class Stream {
 		std::string fifo_directory;
+		std::shared_ptr<ytst::Python> python;
 
 		std::string youtube_url(std::string id);
 		std::string fifo_location();
@@ -33,7 +37,7 @@ namespace ytst {
 		};
 
 	public:
-		Stream(std::string fifo_directory);
+		Stream(std::string fifo_directory, std::shared_ptr<ytst::Python> python);
 		void stream(std::string id);
 	};
 }

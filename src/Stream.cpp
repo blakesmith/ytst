@@ -9,8 +9,9 @@
 #include "Stream.hpp"
 
 namespace ytst {
-	Stream::Stream(std::string fifo_directory) {
+	Stream::Stream(std::string fifo_directory, std::shared_ptr<ytst::Python> python) {
 		this->fifo_directory = fifo_directory;
+		this->python = python;
 	}
 
 	void Stream::stream(std::string id) {
@@ -20,7 +21,7 @@ namespace ytst {
 		ytst::Stream::Fifo fifo(infile);
 
 		std::thread dt([=] { 
-				ytst::YTDownloader downloader(url, infile);
+				ytst::YTDownloader downloader(url, infile, python);
 				downloader.download();
 			});
 	

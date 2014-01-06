@@ -2,6 +2,7 @@
 #define YTST_YT_DOWNLOADER_HPP
 
 #include <string>
+#include <memory>
 
 #include "Python.hpp"
 
@@ -10,9 +11,9 @@ namespace ytst {
 		std::string url;
 		std::string out;
 
-		Python python;
+		std::shared_ptr<ytst::Python> python;
 	public:
-		YTDownloader(std::string url, std::string out);
+		YTDownloader(std::string url, std::string out, std::shared_ptr<Python> python);
 		int download();
 	};
 }

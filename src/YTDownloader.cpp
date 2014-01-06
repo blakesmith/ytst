@@ -6,15 +6,16 @@
 #include "Python.h"
 
 namespace ytst {
-	YTDownloader::YTDownloader(std::string url, std::string out) {
+	YTDownloader::YTDownloader(std::string url,
+				   std::string out,
+				   std::shared_ptr<ytst::Python> python) {
 		this->url = url;
 		this->out = out;
-
-		python.add_path("src/python/youtube-dl");
+		this->python = python;
 	}
 
 	int YTDownloader::download() {
-		auto module = python.import_module("youtube_dl");
+		auto module = python.get()->import_module("youtube_dl");
 
 		std::vector<std::string> func_args;
 		func_args.push_back("-q");
@@ -23,7 +24,7 @@ namespace ytst {
 		func_args.push_back(out);
 		func_args.push_back(url);
 
-		auto result = python.call_func(module.get(), "_real_main", func_args);
+		auto result = python.get()->call_func(module.get(), "_real_main", func_args);
 		return 0;
 	}
 }
