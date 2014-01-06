@@ -1,6 +1,10 @@
 #include <thread>
 #include <iostream>
 
+extern "C" {
+#include "uuid.h"
+}
+
 #include "Log.hpp"
 #include "YTDownloader.hpp"
 #include "Decoder.hpp"
@@ -9,6 +13,8 @@
 #include "Packet.hpp"
 
 #include "Stream.hpp"
+
+const size_t UUID_LENGTH = 36;
 
 namespace ytst {
 	Stream::Stream(std::string fifo_directory,
@@ -58,6 +64,12 @@ namespace ytst {
 	}
 	
 	std::string Stream::stream_id() {
-		return "download";
+		char buf[UUID_LENGTH];
+		afsUUID uuid;
+
+		uuid_create(&uuid);
+		uuid_to_string(&uuid, buf, UUID_LENGTH);
+
+		return std::string(buf, UUID_LENGTH);
 	}
 }
