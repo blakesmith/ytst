@@ -11,7 +11,7 @@ int main(int argc, char **argv) {
 
 	ytst::Python* py = new ytst::Python;
 	std::shared_ptr<ytst::Python> python(py);
-	python.get()->add_path("src/python/youtube-dl");
+	python.get()->add_path(opts.python_path.c_str());
 
 	ytst::Stream stream(opts.fifo_directory, python);
 	stream.stream(opts.video_id);
