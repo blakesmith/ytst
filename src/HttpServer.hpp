@@ -15,9 +15,12 @@ namespace ytst {
 		struct ev_io io;
 		struct ev_signal sio;
 		struct ev_loop *loop;
+		int s;
+
 		Options* options;
 		std::shared_ptr<ytst::Python> python;
-		int s;
+
+		void accept_cb(struct ev_loop *loop, ev_io *watcher, int revents);
 	public:
 		static void io_accept(struct ev_loop *loop, ev_io *watcher, int revents);
 		static void signal_cb(struct ev_loop *loop, ev_signal *signal, int revents);

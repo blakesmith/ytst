@@ -13,7 +13,8 @@ namespace ytst {
 		std::queue<Buffer*> buffers;
 		std::mutex queue_mutex;
 	public:
-		BufferedWriter(std::function<void()> notify);
+		BufferedWriter();
+		void add_callback(std::function<void()> notify);
 		virtual int write_packet(Packet& packet);
 		virtual Buffer* get_buffer();
 	};

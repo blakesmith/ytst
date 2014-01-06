@@ -16,8 +16,7 @@ namespace ytst {
 	private:
 		std::string fifo_directory;
 		std::shared_ptr<ytst::Python> python;
-		Stream* stream;
-		BufferedWriter* writer;
+		BufferedWriter writer;
 		std::thread stream_thread;
 
 		struct ev_loop *loop;
@@ -25,6 +24,8 @@ namespace ytst {
 		ev_async notify;
 		int sfd;
 		std::list<Buffer*> write_queue;
+
+		bool headers_sent = false;
 
 		static void io_cb(struct ev_loop *loop, ev_io *watcher, int revents);
 		static void notify_cb(struct ev_loop *loop, ev_async *watcher, int revents);

@@ -1,4 +1,5 @@
 #include <thread>
+#include <iostream>
 
 #include "YTDownloader.hpp"
 #include "Decoder.hpp"
@@ -12,7 +13,6 @@ namespace ytst {
 	Stream::Stream(std::string fifo_directory,
 		       std::shared_ptr<ytst::Python> python,
 		       Writer* writer) {
-
 		this->fifo_directory = fifo_directory;
 		this->python = python;
 		this->writer = writer;
@@ -37,6 +37,7 @@ namespace ytst {
 
 		AVFrame* frame;
 		ytst::Packet packet;
+		printf("Start decoding\n");
 		while ((frame = decoder.decode_frame()) != nullptr) {
 			encoder.encode_frame(frame, packet);
 			writer->write_packet(packet);

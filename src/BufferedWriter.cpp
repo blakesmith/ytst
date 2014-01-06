@@ -1,7 +1,9 @@
 #include "BufferedWriter.hpp"
 
 namespace ytst {
-	BufferedWriter::BufferedWriter(std::function<void()> notify) {
+	BufferedWriter::BufferedWriter() { }
+
+	void BufferedWriter::add_callback(std::function<void()> notify) {
 		this->notify_fn = notify;
 	}
 

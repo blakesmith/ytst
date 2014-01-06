@@ -1,5 +1,6 @@
 #include <fcntl.h>
 #include <unistd.h>
+#include <iostream>
 
 #include "HttpClient.hpp"
 
@@ -40,10 +41,11 @@ namespace ytst {
 	}
 
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
-		Buffer* buf = writer->get_buffer();
+		Buffer* buf = writer.get_buffer();
 		write_queue.push_back(buf);
 		ev_io_stop(loop, &io);
 		ev_io_set(&io, io.fd, EV_WRITE);
+		ev_io_start(loop, &io);
 	}
 
 	void HttpClient::write_cb(ev_io *watcher) {
@@ -81,7 +83,15 @@ namespace ytst {
 		if (nread == 0) {
 			delete this;
 		} else {
-			write_queue.push_back(new Buffer(buffer, nread));
+			if (!headers_sent) {
+				static const char* header =
+					"HTTP/1.1 200 OK\n"
+					"Content-Type: audio/mpeg\n"
+					"Connection: close\n"
+					"\n";
+				write_queue.push_back(new Buffer(header, strlen(header)));
+				headers_sent = true;
+			}
 		}
 	}
 
@@ -94,11 +104,11 @@ namespace ytst {
 	HttpClient::HttpClient(std::string fifo_directory,
 			       std::shared_ptr<ytst::Python> python,
 			       struct ev_loop *loop,
-			       int s) : fifo_directory(fifo_directory),
-					python(python),
-					loop(loop),
+			       int s) : loop(loop),
 					sfd(s) {
-		
+		this->fifo_directory = fifo_directory;
+		this->python = python;
+
 		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
 		printf("Got connection\n");
 
@@ -106,17 +116,21 @@ namespace ytst {
 		notify.data = (void *)this;
 
 		ev_async_init(&notify, HttpClient::notify_cb);
+		ev_async_start(loop, &notify);
+
 		ev_io_init(&io, HttpClient::io_cb, s, EV_READ);
 		ev_io_start(loop, &io);
 
-		ytst::BufferedWriter wr([=] {
+		writer.add_callback([=] {
 				ev_async_send(loop, &notify);
 			});
-		writer = &wr;
 
-		ytst::Stream strm(fifo_directory, python, writer);
-		stream = &strm;
-		stream_thread = std::thread([=] { stream->stream("lTx3G6h2xyA"); });
+		stream_thread = std::thread([=] {
+				ytst::Stream stream(this->fifo_directory,
+						    this->python, 
+						    &writer);
+				stream.stream("lTx3G6h2xyA");
+			});
 	}
 }
 

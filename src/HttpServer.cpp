@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <iostream>
 #include <unistd.h>
 
 #include "HttpServer.hpp"
@@ -6,8 +7,15 @@
 
 namespace ytst {
 	void HttpServer::io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {
-		HttpServer* impl = (HttpServer *)watcher->data;
+		HttpServer* impl = reinterpret_cast<HttpServer*>(watcher->data);
+		impl->accept_cb(loop, watcher, revents);
+	}
 
+	void HttpServer::signal_cb(struct ev_loop *loop, ev_signal *signal, int revents) {
+		ev_break(loop, EVBREAK_ALL);
+	}
+
+	void HttpServer::accept_cb(struct ev_loop *loop, ev_io *watcher, int revents) {
 		if (EV_ERROR & revents) {
 			perror("Got invalid event.\n");
 			return;
@@ -22,18 +30,15 @@ namespace ytst {
 			return;
 		}
 
-		new HttpClient(impl->options->fifo_directory, impl->python, loop, client_sd);
-	}
-
-	void HttpServer::signal_cb(struct ev_loop *loop, ev_signal *signal, int revents) {
-		ev_break(loop, EVBREAK_ALL);
+		new HttpClient(options->fifo_directory, python, loop, client_sd);
 	}
 
 	void HttpServer::start() {
 		ev_loop(loop, 0);
 	}
 
-	HttpServer::HttpServer(Options* options) : options(options) {
+	HttpServer::HttpServer(Options* options) {
+		this->options = options;
 		int port = 8192;
 
 		ytst::Python* py = new ytst::Python;
@@ -60,7 +65,7 @@ namespace ytst {
 
 		loop = ev_default_loop(0);
 
-		io.data = (void *)this;
+		io.data = reinterpret_cast<void*>(this);
 
 		ev_io_init(&io, HttpServer::io_accept, s, EV_READ);
 		ev_io_start(loop, &io);
