@@ -18,7 +18,7 @@ namespace ytst {
 
 	void HttpClient::callback(struct ev_loop *loop, ev_io *watcher, int revents) {
 		if (EV_ERROR & revents) {
-			perror("Got invalid event");
+			LOG(logWARNING) << "Got invalid event" << strerror(errno);
 			return;
 		}
 
@@ -61,7 +61,7 @@ namespace ytst {
 
 		ssize_t written = write(watcher->fd, buffer->dpos(), buffer->nbytes());
 		if (written < 0) {
-			perror("Read error");
+			LOG(logWARNING) << "Write error" << strerror(errno);
 			return;
 		}
 
@@ -77,19 +77,20 @@ namespace ytst {
 		ssize_t nread = recv(watcher->fd, buffer, sizeof(buffer), 0);
 
 		if (nread < 0) {
-			perror("Read error");
+			LOG(logWARNING) << "Read error" << strerror(errno);
 			return;
 		}
 
 		if (nread == 0) {
+			write(watcher->fd, "\r\n", 2);
 			delete this;
 		} else {
 			if (!headers_sent) {
 				static const char* header =
-					"HTTP/1.1 200 OK\n"
-					"Content-Type: audio/mpeg\n"
-					"Connection: close\n"
-					"\n";
+					"HTTP/1.1 200 OK\r\n"
+					"Content-Type: audio/mpeg\r\n"
+					"Connection: close\r\n"
+					"\r\n";
 				write_queue.push_back(new Buffer(header, strlen(header)));
 				headers_sent = true;
 			}
@@ -97,7 +98,9 @@ namespace ytst {
 	}
 
 	HttpClient::~HttpClient() {
+		stream_thread.join();
 		ev_io_stop(loop, &io);
+		ev_async_stop(loop, &notify);
 		close(sfd);
 		LOG(logINFO) << "Client disconnected";
 	}
@@ -130,7 +133,7 @@ namespace ytst {
 				ytst::Stream stream(this->fifo_directory,
 						    this->python, 
 						    &writer);
-				stream.stream("lTx3G6h2xyA");
+				stream.stream("-5Ilq3kFxek");
 			});
 	}
 }
