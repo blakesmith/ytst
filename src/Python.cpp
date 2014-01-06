@@ -15,7 +15,7 @@ namespace ytst {
 	}
 
 	void Python::add_path(const char* path) {
-		gil = PyGILState_Ensure();
+		GilLock lock(&gil);
 		PyObject* sys = PyImport_ImportModule("sys");
 		PyObject* pPath = PyObject_GetAttrString(sys, "path");
 		PyObject* new_path = PyString_FromString(path);
@@ -23,19 +23,16 @@ namespace ytst {
 		Py_DECREF(sys);
 		Py_DECREF(pPath);
 		Py_DECREF(new_path);
-		PyGILState_Release(gil);
 	}
 
 	std::shared_ptr<PyObject> Python::import_module(const char* module) {
-		gil = PyGILState_Ensure();
+		GilLock lock(&gil);
 		PyObject* pName = PyString_FromString(module);
 		PyObject* pModule = PyImport_Import(pName);
 		Py_DECREF(pName);
 		if (pModule == nullptr) {
 			throw std::runtime_error("Error importing youtube module");
 		}
-
-		PyGILState_Release(gil);
 
 		return std::shared_ptr<PyObject>(pModule,
 						 [](PyObject* p) {
@@ -44,7 +41,7 @@ namespace ytst {
 	}
 
 	std::shared_ptr<PyObject> Python::call_func(PyObject* module, const char* func, std::vector<std::string> args) {
-		gil = PyGILState_Ensure();
+		GilLock lock(&gil);
 		std::unique_ptr<PyObject, std::function<void(PyObject*)>>
 			pFunc(PyObject_GetAttrString(module, func),
 			      [](PyObject* p) {
@@ -66,7 +63,6 @@ namespace ytst {
 			throw std::runtime_error("Python object is not callable");
 		}
 
-		PyGILState_Release(gil);
 		return nullptr;
 	}
 

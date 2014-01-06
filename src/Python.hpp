@@ -10,6 +10,18 @@ extern "C" {
 }
 
 namespace ytst {
+	class GilLock {
+		PyGILState_STATE* gil;
+	public:
+		GilLock(PyGILState_STATE* gil) : gil(gil) {
+			*gil = PyGILState_Ensure();
+		}
+
+		~GilLock() {
+			PyGILState_Release(*gil);
+		}
+	};
+
 	class Python {
 		PyGILState_STATE gil;
 		std::shared_ptr<PyObject> make_arguments(std::vector<std::string> args);
