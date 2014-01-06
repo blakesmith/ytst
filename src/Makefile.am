@@ -2,7 +2,7 @@ RAGEL=ragel
 AM_CXXFLAGS=$(LIBEV_CFLAGS) $(ffmpeg_CFLAGS) $(PYTHON_CPPFLAGS) $(PTHREAD_CFLAGS) -Wall -pedantic
 bin_PROGRAMS=ytst
 ytst_C_SOURCES = http11_parser.h http11_parser.c
-ytst_SOURCES=$(ytst_C_SOURCES) Main.cpp Encoder.hpp Packet.hpp Packet.cpp Decoder.hpp Decoder.cpp FileWriter.hpp FileWriter.cpp MP3Encoder.hpp MP3Encoder.cpp YTDownloader.hpp YTDownloader.cpp Python.hpp Python.cpp Stream.hpp Stream.cpp CmdOpt.hpp CmdOpt.cpp HttpServer.hpp HttpServer.cpp HttpClient.hpp HttpClient.cpp Buffer.hpp Buffer.cpp Writer.hpp BufferedWriter.hpp BufferedWriter.cpp
+ytst_SOURCES=$(ytst_C_SOURCES) Main.cpp Log.hpp Encoder.hpp Packet.hpp Packet.cpp Decoder.hpp Decoder.cpp FileWriter.hpp FileWriter.cpp MP3Encoder.hpp MP3Encoder.cpp YTDownloader.hpp YTDownloader.cpp Python.hpp Python.cpp Stream.hpp Stream.cpp CmdOpt.hpp CmdOpt.cpp HttpServer.hpp HttpServer.cpp HttpClient.hpp HttpClient.cpp Buffer.hpp Buffer.cpp Writer.hpp BufferedWriter.hpp BufferedWriter.cpp
 ytst_LDADD=$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS)
 
 http11_parser.c:

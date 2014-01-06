@@ -2,6 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "Log.hpp"
 #include "HttpServer.hpp"
 #include "HttpClient.hpp"
 
@@ -45,7 +46,7 @@ namespace ytst {
 		python = std::shared_ptr<Python>(py);
 		python.get()->add_path(options->python_path.c_str());
 
-		printf("Listening on port %d\n", port);
+		LOG(logINFO) << "Listening on port " << port;
 
 		struct sockaddr_in addr;
 		

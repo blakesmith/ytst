@@ -1,6 +1,7 @@
 #include <thread>
 #include <iostream>
 
+#include "Log.hpp"
 #include "YTDownloader.hpp"
 #include "Decoder.hpp"
 #include "FileWriter.hpp"
@@ -37,7 +38,7 @@ namespace ytst {
 
 		AVFrame* frame;
 		ytst::Packet packet;
-		printf("Start decoding\n");
+		LOG(logINFO) << "Started decoding";
 		while ((frame = decoder.decode_frame()) != nullptr) {
 			encoder.encode_frame(frame, packet);
 			writer->write_packet(packet);

@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 
+#include "Log.hpp"
 #include "HttpClient.hpp"
 
 namespace ytst {
@@ -98,7 +99,7 @@ namespace ytst {
 	HttpClient::~HttpClient() {
 		ev_io_stop(loop, &io);
 		close(sfd);
-		printf("Client disconnected\n");
+		LOG(logINFO) << "Client disconnected";
 	}
 
 	HttpClient::HttpClient(std::string fifo_directory,
@@ -110,7 +111,7 @@ namespace ytst {
 		this->python = python;
 
 		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
-		printf("Got connection\n");
+		LOG(logINFO) << "Got connection";
 
 		io.data = (void *)this;
 		notify.data = (void *)this;

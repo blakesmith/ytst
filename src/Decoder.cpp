@@ -3,6 +3,7 @@
 #include <mutex>
 #include <memory>
 
+#include "Log.hpp"
 #include "Decoder.hpp"
 
 namespace ytst {
@@ -25,11 +26,11 @@ namespace ytst {
 			throw std::runtime_error("Error finding stream info");
 		}
 
-		std::cout << "Codec ids found: " << std::endl;
+		LOG(logINFO) << "Codec ids found: ";
 		for (unsigned int i = 0; i < avFormatPtr->nb_streams; ++i) {
 			auto stream = avFormatPtr->streams[i];
 			auto codecId = stream->codec->codec_id;
-			std::cout << codecId << std::endl;
+			LOG(logINFO) << codecId;
 		}
 
 		for (unsigned int i = 0; i < avFormatPtr->nb_streams; ++i) {
@@ -59,12 +60,12 @@ namespace ytst {
 		}
 
 		int planar = av_sample_fmt_is_planar(avAudioCodec->sample_fmt);
-		std::cout << "Planar: " << planar << std::endl;
-		std::cout << "Sample fmt: " << avAudioCodec->sample_fmt << std::endl;
+		LOG(logINFO) << "Planar: " << planar;
+		LOG(logINFO) << "Sample fmt: " << avAudioCodec->sample_fmt;
 
 		avFrame = std::shared_ptr<AVFrame>(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
 
-		std::cout << "Decoder frame size: " << avAudioCodec->frame_size << std::endl;
+		LOG(logINFO) << "Decoder frame size: " << avAudioCodec->frame_size;
 
 		return avAudioCodec;
 	}

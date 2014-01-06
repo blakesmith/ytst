@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Log.hpp"
 #include "MP3Encoder.hpp"
 
 namespace ytst {
@@ -30,7 +31,7 @@ namespace ytst {
 			throw std::runtime_error("Could not open the codec");
 		}
 
-		std::cout << "Encoder frame size: " << encoder_context.get()->frame_size << std::endl;
+		LOG(logINFO) << "Encoder frame size: " << encoder_context.get()->frame_size;
 	}
 
 	int MP3Encoder::encode_frame(AVFrame* frame, Packet& packet) {
