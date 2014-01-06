@@ -18,7 +18,7 @@ namespace ytst {
 
 	void HttpClient::callback(struct ev_loop *loop, ev_io *watcher, int revents) {
 		if (EV_ERROR & revents) {
-			LOG(logWARNING) << "Got invalid event" << strerror(errno);
+			LOG(logWARNING) << "Got invalid event: " << strerror(errno);
 			return;
 		}
 
@@ -61,7 +61,7 @@ namespace ytst {
 
 		ssize_t written = write(watcher->fd, buffer->dpos(), buffer->nbytes());
 		if (written < 0) {
-			LOG(logWARNING) << "Write error" << strerror(errno);
+			LOG(logWARNING) << "Write error: " << strerror(errno);
 			return;
 		}
 
@@ -77,7 +77,7 @@ namespace ytst {
 		ssize_t nread = recv(watcher->fd, buffer, sizeof(buffer), 0);
 
 		if (nread < 0) {
-			LOG(logWARNING) << "Read error" << strerror(errno);
+			LOG(logWARNING) << "Read error: " << strerror(errno);
 			return;
 		}
 
