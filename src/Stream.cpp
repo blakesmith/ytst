@@ -9,9 +9,13 @@
 #include "Stream.hpp"
 
 namespace ytst {
-	Stream::Stream(std::string fifo_directory, std::shared_ptr<ytst::Python> python) {
+	Stream::Stream(std::string fifo_directory,
+		       std::shared_ptr<ytst::Python> python,
+		       Writer* writer) {
+
 		this->fifo_directory = fifo_directory;
 		this->python = python;
+		this->writer = writer;
 	}
 
 	void Stream::stream(std::string id) {
@@ -31,15 +35,11 @@ namespace ytst {
 		ytst::MP3Encoder encoder(decoder_ctxt);
 		encoder.open_encoder();
 
-		const char* outfile = "download.mp3";
-		FILE* out = fopen(outfile, "wb");
-		ytst::FileWriter writer(out);
-
 		AVFrame* frame;
 		ytst::Packet packet;
 		while ((frame = decoder.decode_frame()) != nullptr) {
 			encoder.encode_frame(frame, packet);
-			writer.write_packet(packet);
+			writer->write_packet(packet);
 			packet.reset();
 		}
 

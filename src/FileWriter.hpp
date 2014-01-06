@@ -5,15 +5,14 @@
 #include <memory>
 #include <functional>
 
-#include "Packet.hpp"
 #include "Writer.hpp"
 
 namespace ytst {
-	class FileWriter : Writer {
+	class FileWriter : public Writer {
 		std::unique_ptr<FILE, std::function<void(FILE*)>> file;
 	public:
 		FileWriter(FILE* out);
-		int write_packet(Packet& packet);
+		virtual int write_packet(Packet& packet);
 	};
 }
 
