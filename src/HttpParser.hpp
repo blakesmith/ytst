@@ -13,11 +13,14 @@ using namespace std;
 namespace ytst {
 	struct HttpRequest {
 		map<string, string> headers;
+		string request_method;
 		string request_uri;
 		string fragment;
 		string request_path;
 		string query_string;
 		string http_version;
+		const char *body;
+		int body_length;
 	};
 
 	class HttpParser {
