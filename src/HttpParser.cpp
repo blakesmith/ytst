@@ -87,8 +87,8 @@ namespace ytst {
 		hp.query_string = query_string;
 		hp.http_version = http_version;
 		hp.header_done = header_done;
-		http_parser_init(&hp);
 		hp.data = reinterpret_cast<void*>(this);
+		http_parser_init(&hp);
 	}
 
 	HttpParser::~HttpParser() {
