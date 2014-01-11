@@ -94,22 +94,37 @@ namespace ytst {
 	HttpParser::~HttpParser() {
 	}
 
-	int HttpParser::execute(char *data, int offset) {
-		return 0;
+	int HttpParser::execute(char *data, int len, int offset) {
+		http_parser_execute(&hp, data, len, offset);
+
+		VALIDATE_MAX_LENGTH(http_parser_nread(&hp), HEADER);
+
+		if (http_parser_has_error(&hp)) {
+			throw std::runtime_error("Invalid HTTP format");
+		}
+
+		return http_parser_nread(&hp);
 	}
 
 	int HttpParser::nread() {
-		return 0;
+		return hp.nread;
 	}
 	
 	bool HttpParser::finish() {
-		return true;
+		http_parser_finish(&hp);
+
+		return http_parser_is_finished(&hp) ? true : false;
 	}
 
 	bool HttpParser::is_finished() {
-		return false;
+		return http_parser_is_finished(&hp) ? true : false;
+	}
+
+	bool HttpParser::has_error() {
+		return http_parser_has_error(&hp) ? true : false;
 	}
 
 	void HttpParser::reset() {
+		http_parser_init(&hp);
 	}
 }
