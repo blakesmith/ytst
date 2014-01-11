@@ -93,6 +93,8 @@ namespace ytst {
 							    &isFrameAvailable,
 							    &packet.packet);
 
+		packet.reset();
+
 		if (processedLength < 0) {
 			throw std::runtime_error("Error while processing data");
 		}
