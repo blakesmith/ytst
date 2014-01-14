@@ -10,6 +10,13 @@ extern "C" {
 }
 
 namespace ytst {
+	class PythonException : virtual public std::exception {
+		const char *errMessage_;
+	public:
+		PythonException(const char *msg) : errMessage_(msg) {}
+		const char *what() const throw() { return errMessage_; }
+	};
+
 	class GilLock {
 		PyGILState_STATE* gil;
 	public:

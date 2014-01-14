@@ -57,7 +57,11 @@ namespace ytst {
 									 Py_DECREF(p);
 								 });
 			} else {
-				throw std::runtime_error("Python call failed");
+				if (PyErr_Occurred()) {
+					throw PythonException("Python call raised an exception");
+				} else {
+					throw std::runtime_error("Python call failed");
+				}
 			}
 		} else {
 			throw std::runtime_error("Python object is not callable");
