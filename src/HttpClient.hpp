@@ -6,6 +6,7 @@
 #include <thread>
 #include <memory>
 
+#include "HttpParser.hpp"
 #include "Python.hpp"
 #include "BufferedWriter.hpp"
 #include "Stream.hpp"
@@ -14,6 +15,8 @@
 namespace ytst {
 	class HttpClient {
 	private:
+		HttpRequest request;
+		HttpParser parser;
 		std::string fifo_directory;
 		std::shared_ptr<ytst::Python> python;
 		BufferedWriter writer;
@@ -33,6 +36,7 @@ namespace ytst {
 		void callback(struct ev_loop *loop, ev_io *watcher, int revents);
 		void write_cb(ev_io *watcher);
 		void read_cb(ev_io *watcher);
+		void start_decode(const char *youtube_id);
 		virtual ~HttpClient();
 	public:
 		HttpClient(std::string fifo_directory,

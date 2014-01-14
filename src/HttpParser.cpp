@@ -78,7 +78,7 @@ namespace ytst {
 		parser->req->body_length = length;
 	}
 
-	HttpParser::HttpParser(HttpRequest *req) : req(req) {
+	HttpParser::HttpParser() {
 		hp.http_field = http_field;
 		hp.request_method = request_method;
 		hp.request_uri = request_uri;
@@ -94,7 +94,9 @@ namespace ytst {
 	HttpParser::~HttpParser() {
 	}
 
-	int HttpParser::execute(char *data, int len, int offset) {
+	int HttpParser::execute(HttpRequest *req, char *data, int len, int offset) {
+		this->req = req;
+
 		http_parser_execute(&hp, data, len, offset);
 
 		VALIDATE_MAX_LENGTH(http_parser_nread(&hp), HEADER);

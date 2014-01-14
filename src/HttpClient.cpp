@@ -5,6 +5,8 @@
 #include "Log.hpp"
 #include "HttpClient.hpp"
 
+#define READ_BUFFER_SIZE 1024
+
 namespace ytst {
 	void HttpClient::io_cb(struct ev_loop *loop, ev_io *watcher, int revents) {
 		HttpClient *inst = (HttpClient *)watcher->data;
@@ -73,8 +75,9 @@ namespace ytst {
 	}
 
 	void HttpClient::read_cb(ev_io *watcher) {
-		char buffer[1024];
-		ssize_t nread = recv(watcher->fd, buffer, sizeof(buffer), 0);
+		char buffer[READ_BUFFER_SIZE];
+		ssize_t nread = recv(watcher->fd, buffer, READ_BUFFER_SIZE-1, 0);
+		buffer[nread+1] = '\0';
 
 		if (nread < 0) {
 			LOG(logWARNING) << "Read error: " << strerror(errno);
@@ -84,8 +87,14 @@ namespace ytst {
 		if (nread == 0) {
 			write(watcher->fd, "\r\n", 2);
 			delete this;
-		} else {
+		}
+
+		parser.execute(&request, buffer, nread+1, 0);
+		if (parser.is_finished()) {
 			if (!headers_sent) {
+				start_decode("lTx3G6h2xyA");
+
+				std::cout << request.request_path << std::endl;
 				static const char* header =
 					"HTTP/1.1 200 OK\r\n"
 					"Content-Type: audio/mpeg\r\n"
@@ -94,7 +103,28 @@ namespace ytst {
 				write_queue.push_back(new Buffer(header, strlen(header)));
 				headers_sent = true;
 			}
+
+			return;
 		}
+
+	}
+
+	void HttpClient::start_decode(const char *youtube_id) {
+		ev_async_init(&notify, HttpClient::notify_cb);
+		ev_async_start(loop, &notify);
+
+		writer.add_callback([=] {
+				ev_async_send(loop, &notify);
+			});
+
+		LOG(logINFO) << "Starting stream thread";
+		stream_thread = std::thread([=] {
+				ytst::Stream stream(this->fifo_directory,
+						    this->python,
+						    &writer);
+				stream.stream(youtube_id);
+//				stream.stream("-5Ilq3kFxek");
+			});
 	}
 
 	HttpClient::~HttpClient() {
@@ -119,24 +149,8 @@ namespace ytst {
 		io.data = (void *)this;
 		notify.data = (void *)this;
 
-		ev_async_init(&notify, HttpClient::notify_cb);
-		ev_async_start(loop, &notify);
-
 		ev_io_init(&io, HttpClient::io_cb, s, EV_READ);
 		ev_io_start(loop, &io);
-
-		writer.add_callback([=] {
-				ev_async_send(loop, &notify);
-			});
-
-		LOG(logINFO) << "Starting stream thread";
-		stream_thread = std::thread([=] {
-				ytst::Stream stream(this->fifo_directory,
-						    this->python, 
-						    &writer);
-				stream.stream("lTx3G6h2xyA");
-//				stream.stream("-5Ilq3kFxek");
-			});
 	}
 }
 

@@ -36,14 +36,14 @@ namespace ytst {
 		static void http_version(void *data, const char *at, size_t length);
 		static void header_done(void *data, const char *at, size_t length);
 	public:
-		int execute(char *data, int len, int offset);
+		int execute(HttpRequest *req, char *data, int len, int offset);
 		int nread();
 		bool finish();
 		bool is_finished();
 		bool has_error();
 		void reset();
 
-		HttpParser(HttpRequest *req);
+		HttpParser();
 		~HttpParser();
 	};
 }
