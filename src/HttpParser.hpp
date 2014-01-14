@@ -42,6 +42,7 @@ namespace ytst {
 		bool is_finished();
 		bool has_error();
 		void reset();
+		static int parse_query(map<string, string>& res, string& q);
 
 		HttpParser();
 		~HttpParser();

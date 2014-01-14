@@ -129,4 +129,26 @@ namespace ytst {
 	void HttpParser::reset() {
 		http_parser_init(&hp);
 	}
+
+	int HttpParser::parse_query(map<string, string>& res, string& q) {
+		bool has_more = true;
+		string::size_type pos = 0;
+		while (has_more) {
+			string::size_type end_pos = q.find_first_of("=", pos);
+			if (end_pos == string::npos) {
+				has_more = false;
+				break;
+			}
+			auto k = q.substr(pos, end_pos);
+			pos = end_pos+1;
+			end_pos = q.find_first_of("&", pos);
+			if (end_pos == string::npos) {
+				has_more = false;
+			}
+			auto v = q.substr(pos, end_pos);
+			res[k] = v;
+		}
+
+		return 0;
+	}
 }

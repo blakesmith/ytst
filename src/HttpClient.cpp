@@ -88,29 +88,38 @@ namespace ytst {
 			write(watcher->fd, "\r\n", 2);
 			delete this;
 		}
+		
+		if (!headers_sent) {
+			parser.execute(&request, buffer, nread+1, 0);
+			if (parser.is_finished()) {
+				map<string, string> query;
+				HttpParser::parse_query(query, request.query_string);
+				auto youtube_id = query.find("id");
+				if (youtube_id == query.end()) {
+					static const char* header =
+						"HTTP/1.1 400 Bad Request\r\n"
+						"Connection: close\r\n"
+						"Content-Length: 48\r\n"
+						"\r\n"
+						"Must pass youtube video id as query param 'id'\r\n";
+					write_queue.push_back(new Buffer(header, strlen(header)));
+					headers_sent = true;
+				} else {
+					start_decode(youtube_id->second);
 
-		parser.execute(&request, buffer, nread+1, 0);
-		if (parser.is_finished()) {
-			if (!headers_sent) {
-				start_decode("lTx3G6h2xyA");
-
-				std::cout << request.request_path << std::endl;
-				static const char* header =
-					"HTTP/1.1 200 OK\r\n"
-					"Content-Type: audio/mpeg\r\n"
-					"Connection: close\r\n"
-					"\r\n";
-				write_queue.push_back(new Buffer(header, strlen(header)));
-				headers_sent = true;
+					static const char* header =
+						"HTTP/1.1 200 OK\r\n"
+						"Content-Type: audio/mpeg\r\n"
+						"Connection: close\r\n"
+						"\r\n";
+					write_queue.push_back(new Buffer(header, strlen(header)));
+					headers_sent = true;
+				}
 			}
-
-			return;
 		}
-
 	}
 
-	void HttpClient::start_decode(const char *youtube_id) {
-		ev_async_init(&notify, HttpClient::notify_cb);
+	void HttpClient::start_decode(std::string& youtube_id) {
 		ev_async_start(loop, &notify);
 
 		writer.add_callback([=] {
@@ -123,12 +132,13 @@ namespace ytst {
 						    this->python,
 						    &writer);
 				stream.stream(youtube_id);
-//				stream.stream("-5Ilq3kFxek");
 			});
 	}
 
 	HttpClient::~HttpClient() {
-		stream_thread.join();
+		if (stream_thread.joinable()) {
+			stream_thread.join();
+		}
 		ev_io_stop(loop, &io);
 		ev_async_stop(loop, &notify);
 		close(sfd);
@@ -149,6 +159,7 @@ namespace ytst {
 		io.data = (void *)this;
 		notify.data = (void *)this;
 
+		ev_async_init(&notify, HttpClient::notify_cb);
 		ev_io_init(&io, HttpClient::io_cb, s, EV_READ);
 		ev_io_start(loop, &io);
 	}
