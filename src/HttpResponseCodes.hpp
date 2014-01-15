@@ -4,15 +4,14 @@
 using namespace std;
 
 namespace ytst {
-	struct HttpResponseCode {
-		int code;
-		string name;
-	};
-
 	class HttpResponse {
 	public:
-		static const HttpResponseCode StatusOk() {
-			return HttpResponseCode { 200, "OK" };
+		static const int STATUS_OK = 200;
+
+		static const string get_name(const int code) {
+			switch (code) {
+			case 200: return "OK";
+			}
 		}
 	};
 }
