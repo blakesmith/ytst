@@ -2,6 +2,7 @@
 
 namespace ytst {
 	BufferedWriter::BufferedWriter() { }
+	BufferedWriter::~BufferedWriter() { }
 
 	void BufferedWriter::add_callback(std::function<void()> notify) {
 		this->notify_fn = notify;

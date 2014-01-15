@@ -7,14 +7,17 @@
 
 #include "Writer.hpp"
 
+using namespace std;
+
 namespace ytst {
 	class BufferedWriter : public Writer {
-		std::function<void()> notify_fn;
-		std::queue<Buffer*> buffers;
-		std::mutex queue_mutex;
+		function<void()> notify_fn;
+		queue<Buffer*> buffers;
+		mutex queue_mutex;
 	public:
 		BufferedWriter();
-		void add_callback(std::function<void()> notify);
+		~BufferedWriter();
+		void add_callback(function<void()> notify);
 		virtual int write_packet(Packet& packet);
 		virtual Buffer* get_buffer();
 	};
