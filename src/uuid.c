@@ -93,6 +93,9 @@ get_node_addr(char *addr)
 {
     struct ifaddrs *ifa, *ifa0;
     int found_mac = 0;
+#ifndef __APPLE__
+    int i;
+#endif
 
     if (getifaddrs(&ifa0) != 0)
 	ifa0 = NULL;
@@ -135,7 +138,13 @@ get_node_addr(char *addr)
 	 * Set the multicast bit to make sure we won't collide with an
 	 * allocated (mac) address.
 	 */
+#ifdef __APPLE__
 	arc4random_buf(addr, 6);
+#else
+	for (i = 0; i < 6; i++) {
+	    addr[i] = rand() % 256;
+	}
+#endif
 	addr[0] |= UUID_NODE_MULTICAST;
     }
     return;
