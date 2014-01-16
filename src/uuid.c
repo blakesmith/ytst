@@ -164,7 +164,11 @@ uuid_create(afsUUID *uuid)
 
     if (uuid_inited == 0) {
 	gettimeofday(&last_time, NULL);
+#ifdef __APPLE__
 	seq_num = arc4random();
+#else
+	seq_num = rand();
+#endif
 	get_node_addr(nodeaddr);
 	uuid_inited = 1;
     }
