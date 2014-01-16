@@ -2,6 +2,7 @@
 #define YTST_MP3_ENCODER_HPP
 
 #include <memory>
+#include <stdexcept>
 
 #include "Encoder.hpp"
 #include "Packet.hpp"

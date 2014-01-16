@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <memory>
 #include <functional>
+#include <stdexcept>
 
 #include "Writer.hpp"
 

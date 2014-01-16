@@ -9,7 +9,11 @@ namespace ytst {
 	}
 
 	void MP3Encoder::open_encoder() {
+#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(55, 28, 1)
 		const auto codec = avcodec_find_encoder(AV_CODEC_ID_MP3);
+#else
+		const auto codec = avcodec_find_encoder(CODEC_ID_MP3);
+#endif
 		
 		if (codec == nullptr) {
 			throw std::runtime_error("Could not find a suitable audio encoder");

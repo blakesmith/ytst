@@ -152,6 +152,7 @@ namespace ytst {
 					sfd(s) {
 		this->fifo_directory = fifo_directory;
 		this->python = python;
+		this->headers_sent = false;
 
 		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
 		LOG(logINFO) << "Got connection";

@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "HttpParser.hpp"
 
 #define MAX_FIELD_NAME_LENGTH 256

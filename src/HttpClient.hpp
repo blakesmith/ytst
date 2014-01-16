@@ -28,7 +28,7 @@ namespace ytst {
 		int sfd;
 		std::list<Buffer*> write_queue;
 
-		bool headers_sent = false;
+		bool headers_sent;
 
 		static void io_cb(struct ev_loop *loop, ev_io *watcher, int revents);
 		static void notify_cb(struct ev_loop *loop, ev_async *watcher, int revents);

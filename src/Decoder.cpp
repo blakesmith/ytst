@@ -73,7 +73,7 @@ namespace ytst {
 #else
 			avcodec_alloc_frame(),
 			[](AVFrame* fr) {
-				avcodec_free_frame(&fr);
+				av_free(&fr);
 			});
 #endif
 

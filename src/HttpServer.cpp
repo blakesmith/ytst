@@ -56,7 +56,7 @@ namespace ytst {
 		addr.sin_port = htons(port);
 		addr.sin_addr.s_addr = INADDR_ANY;
 
-		if (bind(s, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+		if (::bind(s, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
 			perror("Failed to bind to port.\n");
 		}
 
