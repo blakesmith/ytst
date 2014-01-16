@@ -6,7 +6,7 @@ AC_INIT([YTST], [0.0.1])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([src/Main.cpp])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIRS([m4])
+AC_CONFIG_MACRO_DIR(m4)
 
 # Checks for programs.
 AC_PROG_CXX
