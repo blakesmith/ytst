@@ -55,9 +55,13 @@ namespace ytst {
 		ytst::Packet packet;
 		LOG(logINFO) << "Begin decoding";
 		while ((frame = decoder.decode_frame()) != nullptr) {
-			encoder.encode_frame(frame, packet);
-			writer->write_packet(packet);
-			packet.reset();
+			try {
+				encoder.encode_frame(frame, packet);
+				writer->write_packet(packet);
+				packet.reset();
+			} catch(std::runtime_error e) {
+				LOG(logERROR) << "Encoding exception: " << e.what();
+			}
 		}
 		LOG(logINFO) << "Done decoding";
 	}
