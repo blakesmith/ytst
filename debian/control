@@ -1,0 +1,12 @@
+Source: ytst
+Section: Network
+Priority: optional
+Maintainer: Blake Smith <blakesmith0@gmail.com>
+Build-Depends: cdbs, debhelper (>= 7.0.15), binutils, coreutils, perl, autotools-dev, autoconf (>= 2.60), pkg-config, automake (>= 1.10), libtool, libev-dev, libavcodec-dev
+Standards-Version: 0.0.1
+Homepage: http://github.com/blakesmith/ytst
+
+Package: ytst
+Architecture: x86
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: ytst is a youtube streaming server

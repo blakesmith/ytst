@@ -55,6 +55,31 @@ PKG_CHECK_MODULES([LIBEV], [libev], [], [
 AC_SUBST([LIBEV_CFLAGS])
 AC_SUBST([LIBEV_LIBS])
 
+# Other tools used in this package's various make scripts
+AC_PATH_PROG([PERL], [perl])      # Perl
+AC_PATH_PROG([TAR], [tar gtar])   # tar
+AC_PATH_PROG([XARGS], [xargs])    # xargs
+AC_PATH_PROG([CHMOD], [chmod])    # chmod
+AC_PATH_PROG([CAT], [cat])        # cat
+AC_PATH_PROG([ECHO], [echo])      # echo
+AC_PATH_PROG([CP], [cp])          # cp
+AC_PATH_PROG([DATE], [date])      # date
+AC_PATH_PROG([MV], [mv])          # mv
+AC_PATH_PROG([TEST], [test])
+
+AC_PATH_PROG([DEBUILD], [dpkg-buildpackage], [notfound])
+
+# --enable-deb copies only the ni executable to the dist package, for use in
+# building DEB packages.
+AC_ARG_ENABLE([deb],
+	[AS_HELP_STRING([--enable-deb=@<:@yes/no@:>@],
+		[Configure for building Debian package @<:@default=no@:>@ (requires dpkg-buildpackage)])],
+	[AS_IF([$TEST "x$enable_deb" = xyes],
+	        [AS_IF([$TEST "x$DEBUILD" = xnotfound],
+			      [AC_MSG_ERROR([dpkg-buildpackage is required for --enable-deb])])])],
+	[enable_deb=no])
+
+AM_CONDITIONAL([BUILDING_DEB], [$TEST "x$enable_deb" = xyes])
 
 PKG_CHECK_MODULES(ffmpeg, libavutil libavformat libavcodec, HAVE_FFMPEG=yes)
 
