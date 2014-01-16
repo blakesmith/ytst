@@ -22,6 +22,7 @@ namespace ytst {
 		std::string youtube_url(std::string id);
 		std::string fifo_location();
 		std::string stream_id();
+		std::thread dt;
 
 		class Fifo {
 			std::string path;
@@ -42,6 +43,7 @@ namespace ytst {
 		Stream(std::string fifo_directory,
 		       std::shared_ptr<ytst::Python> python,
 		       Writer* writer);
+		~Stream();
 
 		void stream(std::string id);
 	};

@@ -25,6 +25,12 @@ namespace ytst {
 		this->writer = writer;
 	}
 
+	Stream::~Stream() {
+		if (dt.joinable()) {
+			dt.join();
+		}
+	}
+
 	void Stream::stream(std::string id) {
 		std::string infile = fifo_location();
 		std::string url = youtube_url(id);
@@ -32,7 +38,7 @@ namespace ytst {
 		ytst::Stream::Fifo fifo(infile);
 
 		LOG(logINFO) << "Starting video download";
-		std::thread dt([=] { 
+		dt = std::thread([=] {
 				ytst::YTDownloader downloader(url, infile, python);
 				downloader.download();
 			});
@@ -53,8 +59,6 @@ namespace ytst {
 			writer->write_packet(packet);
 			packet.reset();
 		}
-
-		dt.join();
 	}
 
 	std::string Stream::youtube_url(std::string id) {
