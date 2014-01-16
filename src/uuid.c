@@ -50,8 +50,12 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <net/if.h>
+
+#ifdef __APPLE__
 #include <net/if_types.h>
 #include <net/if_dl.h>
+#endif
+
 #include <sys/file.h>
 
 #include <fcntl.h>
@@ -103,7 +107,7 @@ get_node_addr(char *addr)
 #endif
 
 	switch (ifa->ifa_addr->sa_family) {
-#ifdef AF_LINK
+#ifdef __APPLE__
 	case AF_LINK: {
 	    struct sockaddr_dl *dl = (struct sockaddr_dl *)ifa->ifa_addr;
 

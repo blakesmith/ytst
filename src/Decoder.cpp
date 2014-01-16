@@ -64,7 +64,18 @@ namespace ytst {
 		LOG(logINFO) << "Planar: " << planar;
 		LOG(logINFO) << "Sample fmt: " << avAudioCodec->sample_fmt;
 
-		avFrame = std::shared_ptr<AVFrame>(av_frame_alloc(), [](AVFrame* fr) { av_frame_free(&fr); });
+		avFrame = std::shared_ptr<AVFrame>(
+#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(55, 28, 1)
+			av_frame_alloc(),
+			[](AVFrame* fr) {
+				av_frame_free(&fr);
+			});
+#else
+			avcodec_alloc_frame(),
+			[](AVFrame* fr) {
+				avcodec_free_frame(&fr);
+			});
+#endif
 
 		LOG(logINFO) << "Decoder frame size: " << avAudioCodec->frame_size;
 
