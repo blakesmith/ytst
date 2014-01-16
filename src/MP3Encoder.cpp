@@ -16,6 +16,7 @@ namespace ytst {
 #endif
 		
 		if (codec == nullptr) {
+			LOG(logWARNING) << "Could not find audio codec!";
 			throw std::runtime_error("Could not find a suitable audio encoder");
 		}
 
