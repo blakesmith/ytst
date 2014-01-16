@@ -44,7 +44,7 @@ namespace ytst {
 		LOG(logINFO) << "Starting encoder";
 		ytst::MP3Encoder encoder(decoder_ctxt);
 		encoder.open_encoder();
-
+		
 		AVFrame* frame;
 		ytst::Packet packet;
 		LOG(logINFO) << "Begin decoding";

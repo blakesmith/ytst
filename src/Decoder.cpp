@@ -71,10 +71,7 @@ namespace ytst {
 				av_frame_free(&fr);
 			});
 #else
-			avcodec_alloc_frame(),
-			[](AVFrame* fr) {
-				av_free(&fr);
-			});
+		        avcodec_alloc_frame(), av_free);
 #endif
 
 		LOG(logINFO) << "Decoder frame size: " << avAudioCodec->frame_size;
