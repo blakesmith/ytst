@@ -59,6 +59,7 @@ namespace ytst {
 			writer->write_packet(packet);
 			packet.reset();
 		}
+		LOG(logINFO) << "Done decoding";
 	}
 
 	std::string Stream::youtube_url(std::string id) {
