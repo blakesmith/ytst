@@ -54,6 +54,7 @@ namespace ytst {
 		AVFrame* frame;
 		ytst::Packet packet;
 		LOG(logINFO) << "Begin decoding";
+
 		while ((frame = decoder.decode_frame()) != nullptr) {
 			try {
 				encoder.encode_frame(frame, packet);

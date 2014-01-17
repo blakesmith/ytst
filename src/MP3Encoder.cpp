@@ -47,7 +47,9 @@ namespace ytst {
 					    &has_output);
 
 		if (ret < 0) {
-			throw std::runtime_error(strerror(ret));
+			char errbuff[256];
+			av_strerror(ret, errbuff, 256);
+			throw std::runtime_error(errbuff);
 		}
 
 		return ret;
