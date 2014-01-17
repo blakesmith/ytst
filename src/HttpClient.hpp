@@ -26,7 +26,7 @@ namespace ytst {
 		ev_io io;
 		ev_async notify;
 		int sfd;
-		std::list<Buffer*> write_queue;
+		std::list<std::shared_ptr<Buffer>> write_queue;
 
 		bool headers_sent;
 

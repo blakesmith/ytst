@@ -45,7 +45,7 @@ namespace ytst {
 
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
 		Buffer* buf = writer.get_buffer();
-		write_queue.push_back(buf);
+		write_queue.push_back(std::shared_ptr<Buffer>(buf));
 		ev_io_stop(loop, &io);
 		ev_io_set(&io, io.fd, EV_WRITE);
 		ev_io_start(loop, &io);
@@ -59,18 +59,17 @@ namespace ytst {
 			return;
 		}
 
-		Buffer *buffer = write_queue.front();
+		auto buffer = write_queue.front();
 
-		ssize_t written = write(watcher->fd, buffer->dpos(), buffer->nbytes());
+		ssize_t written = write(watcher->fd, buffer.get()->dpos(), buffer.get()->nbytes());
 		if (written < 0) {
 			LOG(logWARNING) << "Write error: " << strerror(errno);
 			return;
 		}
 
-		buffer->pos += written;
+		buffer.get()->pos += written;
 		if (buffer->nbytes() == 0) {
 			write_queue.pop_front();
-			delete buffer;
 		}
 	}
 
@@ -102,7 +101,7 @@ namespace ytst {
 						"Content-Length: 48\r\n"
 						"\r\n"
 						"Must pass youtube video id as query param 'id'\r\n";
-					write_queue.push_back(new Buffer(header, strlen(header)));
+					write_queue.push_back(std::shared_ptr<Buffer>(new Buffer(header, strlen(header))));
 					headers_sent = true;
 				} else {
 					start_decode(youtube_id->second);
@@ -112,7 +111,7 @@ namespace ytst {
 						"Content-Type: audio/mpeg\r\n"
 						"Connection: close\r\n"
 						"\r\n";
-					write_queue.push_back(new Buffer(header, strlen(header)));
+					write_queue.push_back(std::shared_ptr<Buffer>(new Buffer(header, strlen(header))));
 					headers_sent = true;
 				}
 			}
