@@ -6,8 +6,6 @@
 namespace ytst {
 	Packet::Packet() {
 		av_init_packet(&packet);
-		packet.size = 0;
-		packet.data = nullptr;
 	}
 
 	Packet::Packet(Packet&& other) : packet(std::move(other.packet)) {
@@ -20,6 +18,5 @@ namespace ytst {
 
 	void Packet::reset() {
 		av_free_packet(&packet);
-		packet.data = nullptr;
 	}
 }

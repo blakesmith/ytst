@@ -89,6 +89,7 @@ namespace ytst {
 			}
 		
 			if (packet.packet.stream_index != audioStream->index) {
+				packet.reset();
 				continue;
 			} else {
 				break;
