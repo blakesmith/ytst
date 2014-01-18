@@ -20,8 +20,11 @@ deb: dist
 	$(MKDIR_P) $(DEBSOURCEDIR)/debian && \
 	$(CP) \
 		debian/changelog \
+		debian/compat \
 		debian/control \
 		debian/copyright \
+		debian/docs \
+		debian/rules \
 		$(DEBSOURCEDIR)/debian && \
 	cd $(DEBSOURCEDIR) && \
 	$(DEBUILD) -rfakeroot -D -us -uc; \
