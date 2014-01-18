@@ -8,7 +8,6 @@ extern "C" {
 #include "Log.hpp"
 #include "YTDownloader.hpp"
 #include "Decoder.hpp"
-#include "FileWriter.hpp"
 #include "MP3Encoder.hpp"
 #include "Packet.hpp"
 
