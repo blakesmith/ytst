@@ -1,4 +1,4 @@
-EXTRA_DIST=ytst.init
+EXTRA_DIST=ytst.init python/youtube-dl
 RAGEL=ragel
 AM_CXXFLAGS=$(LIBEV_CFLAGS) $(ffmpeg_CFLAGS) $(PYTHON_CPPFLAGS) $(PTHREAD_CFLAGS) -Wall -pedantic -D__STDC_CONSTANT_MACROS
 bin_PROGRAMS=ytst
