@@ -68,10 +68,10 @@ namespace ytst {
 
 		io.data = reinterpret_cast<void*>(this);
 
-		ev_io_init(&io, HttpServer::io_accept, s, EV_READ);
+		ev_io_init(&io, io_accept, s, EV_READ);
 		ev_io_start(loop, &io);
 
-		ev_signal_init(&sio, HttpServer::signal_cb, SIGINT);
+		ev_signal_init(&sio, signal_cb, SIGINT);
 		ev_signal_start(loop, &sio);
 	}
 

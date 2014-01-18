@@ -159,8 +159,8 @@ namespace ytst {
 		io.data = (void *)this;
 		notify.data = (void *)this;
 
-		ev_async_init(&notify, HttpClient::notify_cb);
-		ev_io_init(&io, HttpClient::io_cb, s, EV_READ);
+		ev_async_init(&notify, notify_cb);
+		ev_io_init(&io, io_cb, s, EV_READ);
 		ev_io_start(loop, &io);
 	}
 }
