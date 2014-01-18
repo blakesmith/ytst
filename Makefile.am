@@ -7,7 +7,6 @@ clean-all:
 pkg: all
 	sudo checkinstall --pkgname=$(PACKAGE) \
 			  --pkgversion=$(VERSION) \
-			  --include debian/conf \
 			  --default
 
 if BUILDING_DEB
