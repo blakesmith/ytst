@@ -57,9 +57,11 @@ namespace ytst {
 		while ((frame = decoder.decode_frame()) != nullptr) {
 			try {
 				encoder.encode_frame(frame, packet);
-				auto buf = new Buffer(reinterpret_cast<const char*>(packet.packet.data),
-						      packet.packet.size);
-				writer->write_buffer(buf);
+				if (packet.packet.size > 0) {
+					auto buf = new Buffer(reinterpret_cast<const char*>(packet.packet.data),
+							      packet.packet.size);
+					writer->write_buffer(buf);
+				}
 				packet.reset();
 			} catch(std::runtime_error e) {
 				LOG(logERROR) << "Encoding exception: " << e.what();

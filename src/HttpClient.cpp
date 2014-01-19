@@ -93,12 +93,12 @@ namespace ytst {
 				auto youtube_id = query.find("id");
 				if (youtube_id == query.end()) {
 					std::string body = "Must pass youtube video id as query param 'id'";
-					writer.write_response(400, true, body);
+					writer.write_response(400, false, body);
 					headers_sent = true;
 				} else {
-					start_decode(youtube_id->second);
 					writer.header["Content-Type"] = "audio/mpeg";
-					writer.write_header(200);
+					writer.write_header(200, true, -1);
+					start_decode(youtube_id->second);
 					headers_sent = true;
 				}
 			}

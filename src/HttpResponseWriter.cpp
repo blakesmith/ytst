@@ -8,29 +8,21 @@ namespace ytst {
 		writer.add_callback(notify);
 	}
 
-	int HttpResponseWriter::write_response(int code, bool send_length, std::string& body) {
+	int HttpResponseWriter::write_response(int code, bool chunked, std::string& body) {
 		auto buf = new Buffer(body.c_str(), body.length());
-		write_buffer(code, send_length, buf);
+		write_buffer(code, chunked, buf);
 		return write_last_chunk();
 	}
 
-	int HttpResponseWriter::write_buffer(int code, bool send_length, Buffer* buf) {
+	int HttpResponseWriter::write_buffer(int code, bool chunked, Buffer* buf) {
 		if (!headers_sent) {
-			if (send_length) {
-				chunked = false;
-				header["Content-Length"] = std::to_string(buf->nbytes()+2);
-			} else {
-				chunked = true;
-				header["Transfer-Encoding"] = "chunked";
-			}
-
-			write_header(code);
+			write_header(code, chunked, buf->nbytes()+2);
 		}
 
-		if (send_length) {
-			writer.write_buffer(buf);
-		} else {
+		if (chunked) {
 			write_chunked_buffer(buf);
+		} else {
+			writer.write_buffer(buf);
 		}
 		
 		return 0;
@@ -48,7 +40,15 @@ namespace ytst {
 		return writer.write_buffer(new Buffer("\r\n", 2));
 	}
 
-	int HttpResponseWriter::write_header(int code) {
+	int HttpResponseWriter::write_header(int code, bool chunked, ssize_t len) {
+		this->chunked = chunked;
+
+		if (chunked) {
+			header["Transfer-Encoding"] = "chunked";
+		} else if (len > 0) {
+			header["Content-Length"] = std::to_string(len);
+		}
+
 		std::string code_name;
 		int res = HttpResponse::get_name(code, code_name);
 		if (res < 0) {
