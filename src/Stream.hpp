@@ -10,14 +10,14 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "Writer.hpp"
+#include "HttpResponseWriter.hpp"
 #include "Python.hpp"
 
 namespace ytst {
 	class Stream {
 		std::string fifo_directory;
 		std::shared_ptr<ytst::Python> python;
-		Writer* writer;
+		HttpResponseWriter* writer;
 
 		std::string youtube_url(std::string id);
 		std::string fifo_location();
@@ -42,7 +42,7 @@ namespace ytst {
 	public:
 		Stream(std::string fifo_directory,
 		       std::shared_ptr<ytst::Python> python,
-		       Writer* writer);
+		       HttpResponseWriter* writer);
 		~Stream();
 
 		void stream(std::string id);

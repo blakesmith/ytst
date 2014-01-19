@@ -13,6 +13,9 @@ namespace ytst {
 	class HttpResponseWriter : public Writer {
 		BufferedWriter writer;
 		bool headers_sent;
+		bool chunked;
+
+		Buffer* make_chunk(Buffer* buf);
 	public:
 		map<string, string> header;
 
@@ -20,6 +23,8 @@ namespace ytst {
 		int write_header(int code);
 		int write_response(int code, bool send_length, std::string& body);
 		int write_buffer(int code, bool send_length, Buffer* buf);
+		int write_chunked_buffer(Buffer* buf);
+		int write_last_chunk();
 		virtual int write_buffer(Buffer* buf);
 		virtual std::shared_ptr<Buffer> get_buffer();
 		virtual bool has_buffer();

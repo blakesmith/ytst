@@ -18,7 +18,7 @@ const size_t UUID_LENGTH = 36;
 namespace ytst {
 	Stream::Stream(std::string fifo_directory,
 		       std::shared_ptr<ytst::Python> python,
-		       Writer* writer) {
+		       HttpResponseWriter* writer) {
 		this->fifo_directory = fifo_directory;
 		this->python = python;
 		this->writer = writer;
@@ -65,6 +65,8 @@ namespace ytst {
 				LOG(logERROR) << "Encoding exception: " << e.what();
 			}
 		}
+		writer->write_last_chunk();
+
 		LOG(logINFO) << "Done decoding";
 	}
 

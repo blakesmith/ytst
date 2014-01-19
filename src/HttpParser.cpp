@@ -104,7 +104,7 @@ namespace ytst {
 		VALIDATE_MAX_LENGTH(http_parser_nread(&hp), HEADER);
 
 		if (http_parser_has_error(&hp)) {
-			throw std::runtime_error("Invalid HTTP format");
+			return -1;
 		}
 
 		return http_parser_nread(&hp);

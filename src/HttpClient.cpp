@@ -83,7 +83,6 @@ namespace ytst {
 		}
 
 		if (nread == 0) {
-			write(watcher->fd, "\r\n", 2);
 			delete this;
 		}
 		
