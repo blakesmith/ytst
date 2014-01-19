@@ -40,7 +40,6 @@ namespace ytst {
 	}
 
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
-		LOG(logDEBUG) << "Event loop received notification";
 		auto buf = writer.get_buffer();
 		write_queue.push(buf);
 		io_reset(EV_WRITE);
@@ -55,8 +54,6 @@ namespace ytst {
 			return;
 		}
 		auto buffer = write_queue.front();
-
-		LOG(logDEBUG) << "About to write buffer";
 
 		ssize_t written = write(watcher->fd,
 					buffer->dpos(),

@@ -1,4 +1,4 @@
-#include "Log.hpp"
+
 #include "BufferedWriter.hpp"
 
 namespace ytst {
@@ -13,7 +13,6 @@ namespace ytst {
 		std::lock_guard<std::mutex> lock(queue_mutex);
 		buffers.push(std::shared_ptr<Buffer>(buf));
 		notify_fn();
-		LOG(logDEBUG) << "Buffer written. Event loop notified";
 
 		return buf->len;
 	}
