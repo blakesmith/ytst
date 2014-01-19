@@ -11,16 +11,16 @@ namespace ytst {
 
 	int BufferedWriter::write_buffer(Buffer* buf) {
 		std::lock_guard<std::mutex> lock(queue_mutex);
-		buffers.push(buf);
+		buffers.push(std::shared_ptr<Buffer>(buf));
 		notify_fn();
 		LOG(logDEBUG) << "Buffer written. Event loop notified";
 
 		return buf->len;
 	}
 
-	Buffer* BufferedWriter::get_buffer() {
+	std::shared_ptr<Buffer> BufferedWriter::get_buffer() {
 		std::lock_guard<std::mutex> lock(queue_mutex);
-		Buffer* buf = buffers.front();
+		auto buf = buffers.front();
 		buffers.pop();
 		return buf;
 	}

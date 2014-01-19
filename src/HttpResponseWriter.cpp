@@ -58,7 +58,7 @@ namespace ytst {
 		return 0;
 	}
 
-	Buffer* HttpResponseWriter::get_buffer() {
+	std::shared_ptr<Buffer> HttpResponseWriter::get_buffer() {
 		return writer.get_buffer();
 	}
 

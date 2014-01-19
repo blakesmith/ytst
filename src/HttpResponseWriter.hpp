@@ -21,7 +21,7 @@ namespace ytst {
 		int write_response(int code, bool send_length, std::string& body);
 		int write_buffer(int code, bool send_length, Buffer* buf);
 		virtual int write_buffer(Buffer* buf);
-		virtual Buffer* get_buffer();
+		virtual std::shared_ptr<Buffer> get_buffer();
 		virtual bool has_buffer();
 
 		HttpResponseWriter();
