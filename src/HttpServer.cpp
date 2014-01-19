@@ -44,7 +44,7 @@ namespace ytst {
 
 		ytst::Python* py = new ytst::Python;
 		python = std::shared_ptr<Python>(py);
-		python.get()->add_path(options->python_path.c_str());
+		python->add_path(options->python_path.c_str());
 
 		LOG(logINFO) << "Listening on port " << port;
 

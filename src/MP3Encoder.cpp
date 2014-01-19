@@ -26,17 +26,17 @@ namespace ytst {
 									  av_free(c);
 								  });
 
-		encoder_context.get()->sample_fmt = decoder_context.get()->sample_fmt;
-		encoder_context.get()->bit_rate = 128000;
-		encoder_context.get()->sample_rate = 44100;
-		encoder_context.get()->channel_layout = select_channel_layout(codec);
-		encoder_context.get()->channels = av_get_channel_layout_nb_channels(encoder_context.get()->channel_layout);
+		encoder_context->sample_fmt = decoder_context->sample_fmt;
+		encoder_context->bit_rate = 128000;
+		encoder_context->sample_rate = 44100;
+		encoder_context->channel_layout = select_channel_layout(codec);
+		encoder_context->channels = av_get_channel_layout_nb_channels(encoder_context->channel_layout);
 
 		if (avcodec_open2(encoder_context.get(), codec, nullptr) < 0) {
 			throw std::runtime_error("Could not open the codec");
 		}
 
-		LOG(logINFO) << "Encoder frame size: " << encoder_context.get()->frame_size;
+		LOG(logINFO) << "Encoder frame size: " << encoder_context->frame_size;
 	}
 
 	int MP3Encoder::encode_frame(AVFrame* frame, Packet& packet) {

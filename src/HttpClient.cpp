@@ -59,14 +59,14 @@ namespace ytst {
 		LOG(logDEBUG) << "About to write buffer";
 
 		ssize_t written = write(watcher->fd,
-					buffer.get()->dpos(),
-					buffer.get()->nbytes());
+					buffer->dpos(),
+					buffer->nbytes());
 		if (written < 0) {
 			LOG(logWARNING) << "Write error: " << strerror(errno);
 			return;
 		}
 
-		buffer.get()->pos += written;
+		buffer->pos += written;
 		if (buffer->nbytes() == 0) {
 			write_queue.pop_front();
 		}
