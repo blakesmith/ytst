@@ -33,13 +33,9 @@ namespace ytst {
 		}
 
 		if (write_queue.empty()) {
-			ev_io_stop(loop, &io);
-			ev_io_set(&io, io.fd, EV_READ);
-			ev_io_start(loop, &io);
+			io_reset(EV_READ);
 		} else {
-			ev_io_stop(loop, &io);
-			ev_io_set(&io, io.fd, EV_READ | EV_WRITE);
-			ev_io_start(loop, &io);
+			io_reset(EV_READ | EV_WRITE);
 		}
 	}
 
@@ -47,9 +43,7 @@ namespace ytst {
 		LOG(logDEBUG) << "Event loop received notification";
 		Buffer* buf = writer.get_buffer();
 		write_queue.push_back(std::shared_ptr<Buffer>(buf));
-		ev_io_stop(loop, &io);
-		ev_io_set(&io, io.fd, EV_WRITE);
-		ev_io_start(loop, &io);
+		io_reset(EV_WRITE);
 		if (writer.has_buffer()) {
 			ev_async_send(loop, &notify);
 		}
@@ -57,9 +51,7 @@ namespace ytst {
 
 	void HttpClient::write_cb(ev_io *watcher) {
 		if (write_queue.empty()) {
-			ev_io_stop(loop, &io);
-			ev_io_set(&io, io.fd, EV_READ);
-			ev_io_start(loop, &io);
+			io_reset(EV_READ);
 			return;
 		}
 		auto buffer = write_queue.front();
@@ -125,6 +117,12 @@ namespace ytst {
 						    &writer);
 				stream.stream(youtube_id);
 			});
+	}
+
+	void HttpClient::io_reset(int mode) {
+		ev_io_stop(loop, &io);
+		ev_io_set(&io, io.fd, mode);
+		ev_io_start(loop, &io);
 	}
 
 	HttpClient::~HttpClient() {

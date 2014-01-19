@@ -37,6 +37,7 @@ namespace ytst {
 		void write_cb(ev_io *watcher);
 		void read_cb(ev_io *watcher);
 		void start_decode(std::string& youtube_id);
+		void io_reset(int mode);
 		virtual ~HttpClient();
 	public:
 		HttpClient(std::string fifo_directory,
