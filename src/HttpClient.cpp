@@ -42,7 +42,7 @@ namespace ytst {
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
 		LOG(logDEBUG) << "Event loop received notification";
 		auto buf = writer.get_buffer();
-		write_queue.push_back(buf);
+		write_queue.push(buf);
 		io_reset(EV_WRITE);
 		if (writer.has_buffer()) {
 			ev_async_send(loop, &notify);
@@ -68,7 +68,7 @@ namespace ytst {
 
 		buffer->pos += written;
 		if (buffer->nbytes() == 0) {
-			write_queue.pop_front();
+			write_queue.pop();
 		}
 	}
 
