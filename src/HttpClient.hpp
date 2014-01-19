@@ -8,7 +8,7 @@
 
 #include "HttpParser.hpp"
 #include "Python.hpp"
-#include "BufferedWriter.hpp"
+#include "HttpResponseWriter.hpp"
 #include "Stream.hpp"
 #include "Buffer.hpp"
 
@@ -19,7 +19,7 @@ namespace ytst {
 		HttpParser parser;
 		std::string fifo_directory;
 		std::shared_ptr<ytst::Python> python;
-		BufferedWriter writer;
+		HttpResponseWriter writer;
 		std::thread stream_thread;
 
 		struct ev_loop *loop;

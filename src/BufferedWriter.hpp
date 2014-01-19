@@ -18,8 +18,9 @@ namespace ytst {
 		BufferedWriter();
 		~BufferedWriter();
 		void add_callback(function<void()> notify);
-		virtual int write_packet(Packet& packet);
+		virtual int write_buffer(Buffer* buf);
 		virtual Buffer* get_buffer();
+		virtual bool has_buffer();
 	};
 }
 #endif

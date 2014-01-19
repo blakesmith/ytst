@@ -44,11 +44,15 @@ namespace ytst {
 	}
 
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
+		LOG(logDEBUG) << "Event loop received notification";
 		Buffer* buf = writer.get_buffer();
 		write_queue.push_back(std::shared_ptr<Buffer>(buf));
 		ev_io_stop(loop, &io);
 		ev_io_set(&io, io.fd, EV_WRITE);
 		ev_io_start(loop, &io);
+		if (writer.has_buffer()) {
+			ev_async_send(loop, &notify);
+		}
 	}
 
 	void HttpClient::write_cb(ev_io *watcher) {
@@ -58,10 +62,13 @@ namespace ytst {
 			ev_io_start(loop, &io);
 			return;
 		}
-
 		auto buffer = write_queue.front();
 
-		ssize_t written = write(watcher->fd, buffer.get()->dpos(), buffer.get()->nbytes());
+		LOG(logDEBUG) << "About to write buffer";
+
+		ssize_t written = write(watcher->fd,
+					buffer.get()->dpos(),
+					buffer.get()->nbytes());
 		if (written < 0) {
 			LOG(logWARNING) << "Write error: " << strerror(errno);
 			return;
@@ -89,29 +96,21 @@ namespace ytst {
 		}
 		
 		if (!headers_sent) {
+			LOG(logDEBUG) << "Parse HTTP request";
 			parser.execute(&request, buffer, nread+1, 0);
 			if (parser.is_finished()) {
+				LOG(logDEBUG) << "Parse HTTP request finished";
 				map<string, string> query;
 				HttpParser::parse_query(query, request.query_string);
 				auto youtube_id = query.find("id");
 				if (youtube_id == query.end()) {
-					static const char* header =
-						"HTTP/1.1 400 Bad Request\r\n"
-						"Connection: close\r\n"
-						"Content-Length: 48\r\n"
-						"\r\n"
-						"Must pass youtube video id as query param 'id'\r\n";
-					write_queue.push_back(std::shared_ptr<Buffer>(new Buffer(header, strlen(header))));
+					std::string body = "Must pass youtube video id as query param 'id'";
+					writer.write_response(400, true, body);
 					headers_sent = true;
 				} else {
 					start_decode(youtube_id->second);
-
-					static const char* header =
-						"HTTP/1.1 200 OK\r\n"
-						"Content-Type: audio/mpeg\r\n"
-						"Connection: close\r\n"
-						"\r\n";
-					write_queue.push_back(std::shared_ptr<Buffer>(new Buffer(header, strlen(header))));
+					writer.header["Content-Type"] = "audio/mpeg";
+					writer.write_header(200);
 					headers_sent = true;
 				}
 			}
@@ -119,12 +118,6 @@ namespace ytst {
 	}
 
 	void HttpClient::start_decode(std::string& youtube_id) {
-		ev_async_start(loop, &notify);
-
-		writer.add_callback([=] {
-				ev_async_send(loop, &notify);
-			});
-
 		LOG(logINFO) << "Starting stream thread";
 		stream_thread = std::thread([=] {
 				ytst::Stream stream(this->fifo_directory,
@@ -151,15 +144,23 @@ namespace ytst {
 					sfd(s) {
 		this->fifo_directory = fifo_directory;
 		this->python = python;
-		this->headers_sent = false;
+
+		headers_sent = false;
 
 		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
 		LOG(logINFO) << "Got connection";
 
-		io.data = (void *)this;
-		notify.data = (void *)this;
+		io.data = reinterpret_cast<void *>(this);
+		notify.data = reinterpret_cast<void *>(this);
 
 		ev_async_init(&notify, notify_cb);
+
+		writer.add_callback([=] {
+				ev_async_send(loop, &notify);
+			});
+
+		ev_async_start(loop, &notify);
+
 		ev_io_init(&io, io_cb, s, EV_READ);
 		ev_io_start(loop, &io);
 	}

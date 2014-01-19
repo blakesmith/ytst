@@ -7,8 +7,9 @@
 namespace ytst {
 	class Writer {
 	public:
-		virtual int write_packet(Packet& packet) = 0;
+		virtual int write_buffer(Buffer *buf) = 0;
 		virtual Buffer* get_buffer() = 0;
+		virtual bool has_buffer() = 0;
 	};
 }
 #endif

@@ -1,3 +1,4 @@
+#include "Log.hpp"
 #include "BufferedWriter.hpp"
 
 namespace ytst {
@@ -8,22 +9,24 @@ namespace ytst {
 		this->notify_fn = notify;
 	}
 
-	int BufferedWriter::write_packet(Packet& packet) {
-		Buffer* buf = new Buffer((const char *)packet.packet.data, packet.packet.size);
-		queue_mutex.lock();
+	int BufferedWriter::write_buffer(Buffer* buf) {
+		std::lock_guard<std::mutex> lock(queue_mutex);
 		buffers.push(buf);
-		queue_mutex.unlock();
 		notify_fn();
+		LOG(logDEBUG) << "Buffer written. Event loop notified";
 
 		return buf->len;
 	}
 
 	Buffer* BufferedWriter::get_buffer() {
-		queue_mutex.lock();
+		std::lock_guard<std::mutex> lock(queue_mutex);
 		Buffer* buf = buffers.front();
 		buffers.pop();
-		queue_mutex.unlock();
-
 		return buf;
+	}
+
+	bool BufferedWriter::has_buffer() {
+		std::lock_guard<std::mutex> lock(queue_mutex);
+		return !buffers.empty();
 	}
 }

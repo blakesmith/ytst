@@ -16,9 +16,15 @@ namespace ytst {
 	public:
 		map<string, string> header;
 
+		void add_callback(std::function<void()> notify);
 		int write_header(int code);
-		virtual int write_packet(Packet& packet);
+		int write_response(int code, bool send_length, std::string& body);
+		int write_buffer(int code, bool send_length, Buffer* buf);
+		virtual int write_buffer(Buffer* buf);
 		virtual Buffer* get_buffer();
+		virtual bool has_buffer();
+
+		HttpResponseWriter();
 	};
 }
 

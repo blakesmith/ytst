@@ -8,9 +8,17 @@ namespace ytst {
 	public:
 		static const int STATUS_OK = 200;
 
-		static const string get_name(const int code) {
+		static const int get_name(const int code, string& out) {
 			switch (code) {
-			case 200: return "OK";
+			case 200:
+				out = "OK";
+				return 0;
+			case 400:
+				out = "Bad Request";
+				return 0;
+			default:
+				out = "OK";
+				return -1;
 			}
 		}
 	};
