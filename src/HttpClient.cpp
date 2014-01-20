@@ -8,12 +8,12 @@
 #define READ_BUFFER_SIZE 1024
 
 namespace ytst {
-	static void io_cb(struct ev_loop *loop, ev_io *watcher, int revents) {
+	void HttpClient::io_cb(struct ev_loop *loop, ev_io *watcher, int revents) {
 		HttpClient *inst = (HttpClient *)watcher->data;
 		inst->callback(loop, watcher, revents);
 	}
 	
-	static void notify_cb(struct ev_loop *loop, ev_async *watcher, int revents) {
+	void HttpClient::notify_cb(struct ev_loop *loop, ev_async *watcher, int revents) {
 		HttpClient *inst = (HttpClient *)watcher->data;
 		inst->notify_callback(loop, watcher, revents);
 	}

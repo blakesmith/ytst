@@ -19,8 +19,11 @@ namespace ytst {
 
 		Options* options;
 		std::shared_ptr<ytst::Python> python;
-	public:
+
 		void accept_cb(struct ev_loop *loop, ev_io *watcher, int revents);
+	public:
+		static void io_accept(struct ev_loop *loop, ev_io *watcher, int revents);
+		static void signal_cb(struct ev_loop *loop, ev_signal *signal, int revents);
 		void start();
 		HttpServer(Options* options);
 		~HttpServer();
