@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([YTST], [0.0.1])
+AC_INIT([YTST], [0.0.2])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_SRCDIR([src/Main.cpp])
 AC_CONFIG_HEADERS([config.h])
