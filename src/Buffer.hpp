@@ -1,12 +1,14 @@
 #ifndef YTST_BUFFER_HPP
 #define YTST_BUFFER_HPP
 
+#include <memory>
+
 #include <stdlib.h>
 #include <resolv.h>
 
 namespace ytst {
 	struct Buffer {
-		char *data;
+		std::unique_ptr<char> data;
 		ssize_t len;
 		ssize_t pos;
 

@@ -6,16 +6,15 @@ namespace ytst {
 	Buffer::Buffer(const char *bytes, ssize_t nbytes) {
 		pos = 0;
 		len = nbytes;
-		data = new char[nbytes];
-		memcpy(data, bytes, nbytes);
+		data = std::unique_ptr<char>(new char[nbytes]);
+		memcpy(data.get(), bytes, nbytes);
 	}
 
 	Buffer::~Buffer() {
-		delete[] data;
 	}
 
 	char *Buffer::dpos() {
-		return data + pos;
+		return data.get() + pos;
 	}
 
 	ssize_t Buffer::nbytes() {
