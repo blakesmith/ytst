@@ -8,7 +8,7 @@ ytst_LDADD=$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS)
 
 install-exec-hook:
 	cp $(srcdir)/ytst.init /etc/init.d/ytst
-	mkdir $(prefix)/lib/ytst
+	mkdir -p $(prefix)/lib/ytst
 	cp -rv $(srcdir)/python $(prefix)/lib/ytst
 
 uninstall-hook:
