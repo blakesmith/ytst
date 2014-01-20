@@ -90,6 +90,10 @@ namespace ytst {
 				LOG(logDEBUG) << "Parse HTTP request finished";
 				map<string, string> query;
 				HttpParser::parse_query(query, request.query_string);
+				for (auto& h : request.headers) {
+					LOG(logDEBUG) << "Header: " << h.first << ", " << h.second;
+				}
+				LOG(logDEBUG) << request.http_version;
 				auto youtube_id = query.find("id");
 				if (youtube_id == query.end()) {
 					std::string body = "Must pass youtube video id as query param 'id'";
@@ -97,6 +101,7 @@ namespace ytst {
 					headers_sent = true;
 				} else {
 					writer.header["Content-Type"] = "audio/mpeg";
+					writer.header["icy-br"] = "128";
 					writer.write_header(200, false, -1);
 					start_decode(youtube_id->second);
 					headers_sent = true;
