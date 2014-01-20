@@ -29,7 +29,7 @@ namespace ytst {
 	}
 
 	int HttpResponseWriter::write_buffer(Buffer* buf) {
-		return write_buffer(HttpResponse::STATUS_OK, true, buf);
+		return write_buffer(HttpResponse::STATUS_OK, chunked, buf);
 	}
 
 	int HttpResponseWriter::write_last_chunk() {

@@ -97,7 +97,7 @@ namespace ytst {
 					headers_sent = true;
 				} else {
 					writer.header["Content-Type"] = "audio/mpeg";
-					writer.write_header(200, true, -1);
+					writer.write_header(200, false, -1);
 					start_decode(youtube_id->second);
 					headers_sent = true;
 				}
