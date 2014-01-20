@@ -7,12 +7,12 @@
 #include "HttpClient.hpp"
 
 namespace ytst {
-	void HttpServer::io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {
+	static void io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {
 		HttpServer* impl = reinterpret_cast<HttpServer*>(watcher->data);
 		impl->accept_cb(loop, watcher, revents);
 	}
 
-	void HttpServer::signal_cb(struct ev_loop *loop, ev_signal *signal, int revents) {
+	static void signal_cb(struct ev_loop *loop, ev_signal *signal, int revents) {
 		ev_break(loop, EVBREAK_ALL);
 	}
 

@@ -30,10 +30,6 @@ namespace ytst {
 
 		bool headers_sent;
 
-		static void io_cb(struct ev_loop *loop, ev_io *watcher, int revents);
-		static void notify_cb(struct ev_loop *loop, ev_async *watcher, int revents);
-		void notify_callback(struct ev_loop *loop, ev_async *watcher, int revents);
-		void callback(struct ev_loop *loop, ev_io *watcher, int revents);
 		void write_cb(ev_io *watcher);
 		void read_cb(ev_io *watcher);
 		void start_decode(std::string& youtube_id);
@@ -44,6 +40,9 @@ namespace ytst {
 			   std::shared_ptr<ytst::Python> python,
 			   struct ev_loop *loop,
 			   int s);
+
+		void notify_callback(struct ev_loop *loop, ev_async *watcher, int revents);
+		void callback(struct ev_loop *loop, ev_io *watcher, int revents);
 	};
 }
 #endif
