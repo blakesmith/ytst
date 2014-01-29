@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "Python.hpp"
+#include "Log.hpp"
 
 namespace ytst {
 	Python::Python() {
@@ -25,6 +26,13 @@ namespace ytst {
 		Py_DECREF(new_path);
 	}
 
+	void Python::interrupt() {
+		GilLock lock(&gil);
+		LOG(logDEBUG) << "About to interrupt Python";
+		Py_AddPendingCall([](void *) { PyErr_SetInterrupt(); return -1; }, nullptr);
+		LOG(logDEBUG) << "Python sent interrupt";
+	}
+
 	std::shared_ptr<PyObject> Python::import_module(const char* module) {
 		GilLock lock(&gil);
 		PyObject* pName = PyString_FromString(module);
@@ -38,6 +46,13 @@ namespace ytst {
 						 [](PyObject* p) {
 							 Py_DECREF(p);
 						 });
+	}
+	
+	void Python::call_async(PyObject* module, const char* func, std::vector<std::string> args) {
+		execution_threads.push_back(std::thread([=] {
+					call_func(module, func, args);
+					LOG(logDEBUG) << "Done with Python execution";
+				}));
 	}
 
 	std::shared_ptr<PyObject> Python::call_func(PyObject* module, const char* func, std::vector<std::string> args) {

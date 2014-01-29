@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <thread>
 
 extern "C" {
 #include <Python.h>
@@ -32,12 +33,15 @@ namespace ytst {
 	class Python {
 		PyGILState_STATE gil;
 		std::shared_ptr<PyObject> make_arguments(std::vector<std::string> args);
+		std::vector<std::thread> execution_threads;
 	public:
 		Python();
 		~Python();
 		void add_path(const char* path);
 		std::shared_ptr<PyObject> import_module(const char* module);
 		std::shared_ptr<PyObject> call_func(PyObject* module, const char* func, std::vector<std::string> args);
+		void call_async(PyObject* module, const char* func, std::vector<std::string> args);
+		void interrupt();
 	};
 }
 

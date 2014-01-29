@@ -18,16 +18,14 @@ const size_t UUID_LENGTH = 36;
 namespace ytst {
 	Stream::Stream(std::string fifo_directory,
 		       std::shared_ptr<ytst::Python> python,
-		       HttpResponseWriter* writer) {
+		       std::atomic<bool>& stream_running,
+		       HttpResponseWriter* writer) : stream_running(stream_running) {
 		this->fifo_directory = fifo_directory;
 		this->python = python;
 		this->writer = writer;
 	}
 
 	Stream::~Stream() {
-		if (dt.joinable()) {
-			dt.join();
-		}
 	}
 
 	void Stream::stream(std::string id) {
@@ -37,10 +35,9 @@ namespace ytst {
 		ytst::Stream::Fifo fifo(infile);
 
 		LOG(logINFO) << "Starting video download";
-		dt = std::thread([=] {
-				ytst::YTDownloader downloader(url, infile, python);
-				downloader.download();
-			});
+
+		ytst::YTDownloader downloader(url, infile, python);
+		downloader.download();
 
 		LOG(logINFO) << "Starting decoder";
 		ytst::Decoder decoder(infile);
@@ -54,7 +51,7 @@ namespace ytst {
 		ytst::Packet packet;
 		LOG(logINFO) << "Begin decoding";
 
-		while ((frame = decoder.decode_frame()) != nullptr) {
+		while ((frame = decoder.decode_frame()) != nullptr && stream_running) {
 			try {
 				encoder.encode_frame(frame, packet);
 				if (packet.packet.size > 0) {

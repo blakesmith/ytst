@@ -9,6 +9,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <atomic>
 
 #include "HttpResponseWriter.hpp"
 #include "Python.hpp"
@@ -18,11 +19,11 @@ namespace ytst {
 		std::string fifo_directory;
 		std::shared_ptr<ytst::Python> python;
 		HttpResponseWriter* writer;
+		std::atomic<bool>& stream_running;
 
 		std::string youtube_url(std::string id);
 		std::string fifo_location();
 		std::string stream_id();
-		std::thread dt;
 
 		class Fifo {
 			std::string path;
@@ -42,6 +43,7 @@ namespace ytst {
 	public:
 		Stream(std::string fifo_directory,
 		       std::shared_ptr<ytst::Python> python,
+		       std::atomic<bool>& stream_running,
 		       HttpResponseWriter* writer);
 		~Stream();
 

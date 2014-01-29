@@ -13,7 +13,9 @@ namespace ytst {
 
 		std::shared_ptr<ytst::Python> python;
 	public:
-		YTDownloader(std::string url, std::string out, std::shared_ptr<Python> python);
+		YTDownloader(std::string url,
+			     std::string out,
+			     std::shared_ptr<Python> python);
 		int download();
 	};
 }

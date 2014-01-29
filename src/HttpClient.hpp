@@ -5,6 +5,7 @@
 #include <list>
 #include <thread>
 #include <memory>
+#include <atomic>
 
 #include "HttpParser.hpp"
 #include "Python.hpp"
@@ -21,6 +22,7 @@ namespace ytst {
 		std::shared_ptr<ytst::Python> python;
 		HttpResponseWriter writer;
 		std::thread stream_thread;
+		std::atomic<bool> stream_running;
 
 		struct ev_loop *loop;
 		ev_io io;

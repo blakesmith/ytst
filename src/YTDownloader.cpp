@@ -24,7 +24,7 @@ namespace ytst {
 		func_args.push_back(out);
 		func_args.push_back(url);
 
-		auto result = python->call_func(module.get(), "_real_main", func_args);
+		python->call_async(module.get(), "_real_main", func_args);
 		return 0;
 	}
 }

@@ -113,9 +113,11 @@ namespace ytst {
 
 	void HttpClient::start_decode(std::string& youtube_id) {
 		LOG(logINFO) << "Starting stream thread";
+		stream_running = true;
 		stream_thread = std::thread([=] {
 				ytst::Stream stream(this->fifo_directory,
 						    this->python,
+						    stream_running,
 						    &writer);
 				stream.stream(youtube_id);
 			});
@@ -128,9 +130,12 @@ namespace ytst {
 	}
 
 	HttpClient::~HttpClient() {
+		stream_running = false;
 		if (stream_thread.joinable()) {
 			stream_thread.join();
 		}
+		python->interrupt();
+
 		ev_io_stop(loop, &io);
 		ev_async_stop(loop, &notify);
 		close(sfd);
@@ -138,7 +143,7 @@ namespace ytst {
 	}
 
 	HttpClient::HttpClient(std::string fifo_directory,
-			       std::shared_ptr<ytst::Python> python,
+			       std::shared_ptr<Python> python,
 			       struct ev_loop *loop,
 			       int s) : loop(loop),
 					sfd(s) {
