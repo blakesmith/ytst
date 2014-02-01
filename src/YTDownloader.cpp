@@ -1,9 +1,10 @@
 #include <mutex>
 #include <vector>
+#include <signal.h>
 
+#include "Log.hpp"
 #include "YTDownloader.hpp"
-
-#include "Python.h"
+#include "Python.hpp"
 
 namespace ytst {
 	YTDownloader::YTDownloader(std::string url,
@@ -12,6 +13,14 @@ namespace ytst {
 		this->url = url;
 		this->out = out;
 		this->python = python;
+	}
+
+	YTDownloader::~YTDownloader() {
+		if (python_pid > 0) {
+			LOG(logDEBUG) << "About to kill child process with pid: " << python_pid;
+			kill(python_pid, SIGQUIT);
+			wait(nullptr);
+		}
 	}
 
 	int YTDownloader::download() {
@@ -24,7 +33,7 @@ namespace ytst {
 		func_args.push_back(out);
 		func_args.push_back(url);
 
-		python->call_async(module.get(), "_real_main", func_args);
+		python_pid = python->call_async(module.get(), "_real_main", func_args);
 		return 0;
 	}
 }

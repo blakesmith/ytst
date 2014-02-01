@@ -40,7 +40,7 @@ namespace ytst {
 		void add_path(const char* path);
 		std::shared_ptr<PyObject> import_module(const char* module);
 		std::shared_ptr<PyObject> call_func(PyObject* module, const char* func, std::vector<std::string> args);
-		void call_async(PyObject* module, const char* func, std::vector<std::string> args);
+		pid_t call_async(PyObject* module, const char* func, std::vector<std::string> args);
 		void interrupt();
 	};
 }

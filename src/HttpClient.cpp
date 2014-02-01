@@ -134,7 +134,6 @@ namespace ytst {
 		if (stream_thread.joinable()) {
 			stream_thread.join();
 		}
-		python->interrupt();
 
 		ev_io_stop(loop, &io);
 		ev_async_stop(loop, &notify);

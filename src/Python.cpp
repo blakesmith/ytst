@@ -48,11 +48,15 @@ namespace ytst {
 						 });
 	}
 	
-	void Python::call_async(PyObject* module, const char* func, std::vector<std::string> args) {
-		execution_threads.push_back(std::thread([=] {
-					call_func(module, func, args);
-					LOG(logDEBUG) << "Done with Python execution";
-				}));
+	pid_t Python::call_async(PyObject* module, const char* func, std::vector<std::string> args) {
+		pid_t pid = fork();
+		if (pid == 0) {
+			call_func(module, func, args);
+			LOG(logDEBUG) << "Done with Python execution";
+			exit(0);
+		}
+
+		return pid;
 	}
 
 	std::shared_ptr<PyObject> Python::call_func(PyObject* module, const char* func, std::vector<std::string> args) {
@@ -73,7 +77,11 @@ namespace ytst {
 								 });
 			} else {
 				if (PyErr_Occurred()) {
-					throw PythonException("Python call raised an exception");
+					if (PyErr_ExceptionMatches(PyExc_KeyboardInterrupt)) {
+						return nullptr;
+					} else {
+						throw PythonException("Python call raised an unhandled exception");
+					}
 				} else {
 					throw std::runtime_error("Python call failed");
 				}
