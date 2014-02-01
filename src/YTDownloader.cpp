@@ -1,6 +1,7 @@
 #include <mutex>
 #include <vector>
 #include <signal.h>
+#include <sys/wait.h>
 
 #include "Log.hpp"
 #include "YTDownloader.hpp"
