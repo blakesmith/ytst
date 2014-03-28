@@ -12,12 +12,12 @@
 #include <atomic>
 
 #include "HttpResponseWriter.hpp"
-#include "Python.hpp"
+#include "PythonSupervisor.hpp"
 
 namespace ytst {
 	class Stream {
 		std::string fifo_directory;
-		std::shared_ptr<ytst::Python> python;
+		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
 		HttpResponseWriter* writer;
 		std::atomic<bool>& stream_running;
 
@@ -42,7 +42,7 @@ namespace ytst {
 
 	public:
 		Stream(std::string fifo_directory,
-		       std::shared_ptr<ytst::Python> python,
+		       std::shared_ptr<ytst::PythonSupervisor> python_supervisor,
 		       std::atomic<bool>& stream_running,
 		       HttpResponseWriter* writer);
 		~Stream();

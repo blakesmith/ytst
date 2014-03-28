@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "CmdOpt.hpp"
-#include "Python.hpp"
+#include "PythonSupervisor.hpp"
 
 namespace ytst {
 	class HttpServer {
@@ -18,7 +18,7 @@ namespace ytst {
 		int s;
 
 		Options* options;
-		std::shared_ptr<ytst::Python> python;
+		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
 
 		void accept_cb(struct ev_loop *loop, ev_io *watcher, int revents);
 	public:

@@ -48,17 +48,6 @@ namespace ytst {
 						 });
 	}
 	
-	pid_t Python::call_async(PyObject* module, const char* func, std::vector<std::string> args) {
-		pid_t pid = fork();
-		if (pid == 0) {
-			call_func(module, func, args);
-			LOG(logDEBUG) << "Done with Python execution";
-			exit(0);
-		}
-
-		return pid;
-	}
-
 	std::shared_ptr<PyObject> Python::call_func(PyObject* module, const char* func, std::vector<std::string> args) {
 		GilLock lock(&gil);
 		std::unique_ptr<PyObject, std::function<void(PyObject*)>>

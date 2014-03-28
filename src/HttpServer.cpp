@@ -31,7 +31,7 @@ namespace ytst {
 			return;
 		}
 
-		new HttpClient(options->fifo_directory, python, loop, client_sd);
+		new HttpClient(options->fifo_directory, python_supervisor, loop, client_sd);
 	}
 
 	void HttpServer::start() {
@@ -42,9 +42,9 @@ namespace ytst {
 		this->options = options;
 		int port = 8192;
 
-		ytst::Python* py = new ytst::Python;
-		python = std::shared_ptr<Python>(py);
-		python->add_path(options->python_path.c_str());
+		
+		python_supervisor = std::shared_ptr<PythonSupervisor>(new ytst::PythonSupervisor);
+		python_supervisor->add_default_path(options->python_path);
 
 		LOG(logINFO) << "Listening on port " << port;
 

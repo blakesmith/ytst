@@ -116,7 +116,7 @@ namespace ytst {
 		stream_running = true;
 		stream_thread = std::thread([=] {
 				ytst::Stream stream(this->fifo_directory,
-						    this->python,
+						    this->python_supervisor,
 						    stream_running,
 						    &writer);
 				stream.stream(youtube_id);
@@ -142,12 +142,12 @@ namespace ytst {
 	}
 
 	HttpClient::HttpClient(std::string fifo_directory,
-			       std::shared_ptr<Python> python,
+			       std::shared_ptr<PythonSupervisor> python_supervisor,
 			       struct ev_loop *loop,
 			       int s) : loop(loop),
 					sfd(s) {
 		this->fifo_directory = fifo_directory;
-		this->python = python;
+		this->python_supervisor = python_supervisor;
 
 		headers_sent = false;
 

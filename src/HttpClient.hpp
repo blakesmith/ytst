@@ -8,7 +8,7 @@
 #include <atomic>
 
 #include "HttpParser.hpp"
-#include "Python.hpp"
+#include "PythonSupervisor.hpp"
 #include "HttpResponseWriter.hpp"
 #include "Stream.hpp"
 #include "Buffer.hpp"
@@ -19,7 +19,7 @@ namespace ytst {
 		HttpRequest request;
 		HttpParser parser;
 		std::string fifo_directory;
-		std::shared_ptr<ytst::Python> python;
+		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
 		HttpResponseWriter writer;
 		std::thread stream_thread;
 		std::atomic<bool> stream_running;
@@ -43,7 +43,7 @@ namespace ytst {
 		virtual ~HttpClient();
 	public:
 		HttpClient(std::string fifo_directory,
-			   std::shared_ptr<ytst::Python> python,
+			   std::shared_ptr<ytst::PythonSupervisor> python_supervisor,
 			   struct ev_loop *loop,
 			   int s);
 	};
