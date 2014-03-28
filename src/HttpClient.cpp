@@ -101,7 +101,9 @@ namespace ytst {
 					headers_sent = true;
 				} else {
 					writer.header["Content-Type"] = "audio/mpeg";
-					writer.write_header(200, true, -1);
+					// XXX: Hack! I can't get SONOS to work with chunked encoding, so just make the content-length really long
+					writer.header["Content-Length"] = "104857600";
+					writer.write_header(200, false, -1);
 					start_decode(youtube_id->second);
 					headers_sent = true;
 				}
