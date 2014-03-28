@@ -11,12 +11,8 @@ audio portion of a youtube video to a sonos device via
 
 ## TODO
 
-- Accept the actual youtube video id as as input query param. Right
-  now it just hardcodes a Madeon video. Need to integrate an actual
-  http parser.
-- Investigate memory usage. Might just be the embedded python
-  interpreter adding bloat
 - Better encoder thread frame buffering strategy
+- Figure out how to get chunked transfer encoding working with Sonos, or use some other scheme to get the correct content-length size
 
 ## Compile / Use
 
@@ -36,5 +32,5 @@ Start ytst:
 	
 Then try a local mplayer call to stream a video:
 
-    mplayer "http://localhost:8192"
+    mplayer "http://localhost:8192/stream?id=lTx3G6h2xyA"
 	
