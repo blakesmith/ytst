@@ -43,7 +43,7 @@ namespace ytst {
 		int port = 8192;
 
 		
-		python_supervisor = std::shared_ptr<PythonSupervisor>(new ytst::PythonSupervisor);
+		python_supervisor = std::make_shared<PythonSupervisor>();
 		python_supervisor->add_default_path(options->python_path);
 
 		LOG(logINFO) << "Listening on port " << port;
