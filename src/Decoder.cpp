@@ -7,10 +7,9 @@
 #include "Decoder.hpp"
 
 namespace ytst {
-	Decoder::Decoder(std::string infile) {
+	Decoder::Decoder(const std::string& infile) : infile(infile) {
 		static std::once_flag initFlag;
 		std::call_once(initFlag, []() { av_register_all(); });
-		this->infile = infile;
 		audioStream = nullptr;
 	}
 
@@ -112,7 +111,7 @@ namespace ytst {
 			return avFrame.get();
 		} else {
 			// Didn't get a frame, try reading again
-			return this->decode_frame();
+			return decode_frame();
 		}
 
 		// Should never reach here

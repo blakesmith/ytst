@@ -4,9 +4,7 @@
 #include "MP3Encoder.hpp"
 
 namespace ytst {
-	MP3Encoder::MP3Encoder(std::shared_ptr<AVCodecContext> ctxt) {
-		this->decoder_context = ctxt;
-	}
+	MP3Encoder::MP3Encoder(std::shared_ptr<AVCodecContext> ctxt) : decoder_context(ctxt) { }
 
 	void MP3Encoder::open_encoder() {
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(55, 28, 1)

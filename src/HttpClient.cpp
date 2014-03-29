@@ -115,10 +115,10 @@ namespace ytst {
 		LOG(logINFO) << "Starting stream thread";
 		stream_running = true;
 		stream_thread = std::thread([=] {
-				ytst::Stream stream(this->fifo_directory,
-						    this->python_supervisor,
+				ytst::Stream stream(fifo_directory,
+						    python_supervisor,
 						    stream_running,
-						    &writer);
+						    writer);
 				stream.stream(youtube_id);
 			});
 	}
@@ -141,14 +141,15 @@ namespace ytst {
 		LOG(logINFO) << "Client disconnected";
 	}
 
-	HttpClient::HttpClient(std::string fifo_directory,
+	HttpClient::HttpClient(const std::string& fifo_directory,
 			       std::shared_ptr<PythonSupervisor> python_supervisor,
 			       struct ev_loop *loop,
-			       int s) : loop(loop),
-					sfd(s) {
-		this->fifo_directory = fifo_directory;
-		this->python_supervisor = python_supervisor;
-
+			       int s) : 
+		fifo_directory(fifo_directory),
+		python_supervisor(python_supervisor),
+		loop(loop),
+		sfd(s)
+	{
 		headers_sent = false;
 
 		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);

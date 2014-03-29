@@ -18,7 +18,7 @@ namespace ytst {
 	private:
 		HttpRequest request;
 		HttpParser parser;
-		std::string fifo_directory;
+		const std::string& fifo_directory;
 		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
 		HttpResponseWriter writer;
 		std::thread stream_thread;
@@ -42,7 +42,7 @@ namespace ytst {
 		void io_reset(int mode);
 		virtual ~HttpClient();
 	public:
-		HttpClient(std::string fifo_directory,
+		HttpClient(const std::string& fifo_directory,
 			   std::shared_ptr<ytst::PythonSupervisor> python_supervisor,
 			   struct ev_loop *loop,
 			   int s);

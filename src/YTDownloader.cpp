@@ -8,13 +8,12 @@
 #include "PythonSupervisor.hpp"
 
 namespace ytst {
-	YTDownloader::YTDownloader(std::string url,
-				   std::string out,
-				   std::shared_ptr<ytst::PythonSupervisor> python_supervisor) {
-		this->url = url;
-		this->out = out;
-		this->python_supervisor = python_supervisor;
-	}
+	YTDownloader::YTDownloader(const std::string& url,
+				   const std::string& out,
+				   std::shared_ptr<ytst::PythonSupervisor> python_supervisor) :
+		url(url),
+		out(out),
+		python_supervisor(python_supervisor) { }
 
 	YTDownloader::~YTDownloader() {
 		if (python_pid > 0) {

@@ -12,7 +12,7 @@ extern "C" {
 
 namespace ytst {
 	class Decoder {
-		std::string infile;
+		const std::string& infile;
 		std::shared_ptr<AVFormatContext> avFormat;
 		std::shared_ptr<AVCodecContext> avAudioCodec;
 		std::shared_ptr<AVFrame> avFrame;
@@ -21,7 +21,7 @@ namespace ytst {
 		AVStream* audioStream;
 
 	public:
-		Decoder(std::string infile);
+		Decoder(const std::string& infile);
 		std::shared_ptr<AVCodecContext> read_file();
 		AVFrame* decode_frame();
 	};

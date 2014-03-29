@@ -6,7 +6,7 @@ namespace ytst {
 	BufferedWriter::~BufferedWriter() { }
 
 	void BufferedWriter::add_callback(std::function<void()> notify) {
-		this->notify_fn = notify;
+		notify_fn = notify;
 	}
 
 	int BufferedWriter::write_buffer(Buffer* buf) {

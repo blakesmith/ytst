@@ -16,19 +16,19 @@ extern "C" {
 const size_t UUID_LENGTH = 36;
 
 namespace ytst {
-	Stream::Stream(std::string fifo_directory,
+	Stream::Stream(const std::string& fifo_directory,
 		       std::shared_ptr<ytst::PythonSupervisor> python_supervisor,
 		       std::atomic<bool>& stream_running,
-		       HttpResponseWriter* writer) : stream_running(stream_running) {
-		this->fifo_directory = fifo_directory;
-		this->python_supervisor = python_supervisor;
-		this->writer = writer;
-	}
+		       HttpResponseWriter& writer) : 
+		fifo_directory(fifo_directory),
+		python_supervisor(python_supervisor),
+		stream_running(stream_running),
+		writer(writer) { }
 
 	Stream::~Stream() {
 	}
 
-	void Stream::stream(std::string id) {
+	void Stream::stream(const std::string& id) {
 		std::string infile = fifo_location();
 		std::string url = youtube_url(id);
 
@@ -57,19 +57,19 @@ namespace ytst {
 				if (packet.packet.size > 0) {
 					auto buf = new Buffer(reinterpret_cast<const char*>(packet.packet.data),
 							      packet.packet.size);
-					writer->write_buffer(buf);
+					writer.write_buffer(buf);
 				}
 				packet.reset();
 			} catch(std::runtime_error e) {
 				LOG(logERROR) << "Encoding exception: " << e.what();
 			}
 		}
-		writer->write_last_chunk();
+		writer.write_last_chunk();
 
 		LOG(logINFO) << "Done decoding";
 	}
 
-	std::string Stream::youtube_url(std::string id) {
+	std::string Stream::youtube_url(const std::string& id) {
 		return std::string("https://www.youtube.com/watch?v=") + id;
 	}
 

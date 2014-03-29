@@ -8,15 +8,15 @@
 
 namespace ytst {
 	class YTDownloader {
-		std::string url;
-		std::string out;
+		const std::string& url;
+		const std::string& out;
 		pid_t python_pid;
 
 		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
 		std::shared_ptr<ytst::Python> python;
 	public:
-		YTDownloader(std::string url,
-			     std::string out,
+		YTDownloader(const std::string& url,
+			     const std::string& out,
 			     std::shared_ptr<PythonSupervisor> python_supervisor);
 		~YTDownloader();
 		int download();
