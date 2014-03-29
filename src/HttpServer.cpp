@@ -39,19 +39,17 @@ namespace ytst {
 	}
 
 	HttpServer::HttpServer(const Options& options) : options(options) {
-		int port = 8192;
-		
 		python_supervisor = std::make_shared<PythonSupervisor>();
 		python_supervisor->add_default_path(options.python_path);
 
-		LOG(logINFO) << "Listening on port " << port;
+		LOG(logINFO) << "Listening on port " << options.listen_port;
 
 		struct sockaddr_in addr;
 		
 		s = socket(PF_INET, SOCK_STREAM, 0);
 
 		addr.sin_family = AF_INET;
-		addr.sin_port = htons(port);
+		addr.sin_port = htons(options.listen_port);
 		addr.sin_addr.s_addr = INADDR_ANY;
 
 		if (::bind(s, (struct sockaddr *)&addr, sizeof(addr)) != 0) {

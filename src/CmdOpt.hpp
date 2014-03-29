@@ -5,9 +5,9 @@
 
 namespace ytst {
 	struct Options {
-		std::string video_id;
 		std::string fifo_directory;
 		std::string python_path;
+		int listen_port;
 	};
 
 	class CmdOpt {
