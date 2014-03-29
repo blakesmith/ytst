@@ -17,7 +17,7 @@ namespace ytst {
 		struct ev_loop *loop;
 		int s;
 
-		Options* options;
+		const Options& options;
 		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
 
 		void accept_cb(struct ev_loop *loop, ev_io *watcher, int revents);
@@ -25,7 +25,7 @@ namespace ytst {
 		static void io_accept(struct ev_loop *loop, ev_io *watcher, int revents);
 		static void signal_cb(struct ev_loop *loop, ev_signal *signal, int revents);
 		void start();
-		HttpServer(Options* options);
+		HttpServer(const Options& options);
 		~HttpServer();
 	};
 }
