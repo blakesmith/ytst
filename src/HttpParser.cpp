@@ -140,7 +140,6 @@ namespace ytst {
 		while (has_more) {
 			end_pos = q.find_first_of("=", pos);
 			if (end_pos == string::npos) {
-				has_more = false;
 				break;
 			}
 			auto k = q.substr(pos, end_pos-pos);
