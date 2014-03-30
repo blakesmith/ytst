@@ -17,7 +17,7 @@ const size_t UUID_LENGTH = 36;
 
 namespace ytst {
 	Stream::Stream(const std::string& fifo_directory,
-		       std::shared_ptr<ytst::PythonSupervisor> python_supervisor,
+		       std::shared_ptr<PythonSupervisor> python_supervisor,
 		       std::atomic<bool>& stream_running,
 		       HttpResponseWriter& writer) : 
 		fifo_directory(fifo_directory),

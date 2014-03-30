@@ -26,9 +26,9 @@ namespace ytst {
 		std::string stream_id();
 
 		class Fifo {
-			std::string path;
+			const std::string& path;
 		public:
-			Fifo(std::string path) : path(path) {
+			Fifo(const std::string& path) : path(path) {
 				if (mkfifo(path.c_str(), 0644) < 0) {
 					throw std::runtime_error("Error making named pipe");
 				}
@@ -41,7 +41,7 @@ namespace ytst {
 
 	public:
 		Stream(const std::string& fifo_directory,
-		       std::shared_ptr<ytst::PythonSupervisor> python_supervisor,
+		       std::shared_ptr<PythonSupervisor> python_supervisor,
 		       std::atomic<bool>& stream_running,
 		       HttpResponseWriter& writer);
 		~Stream();
