@@ -1,8 +1,3 @@
-#include <memory>
-#include <stdio.h>
-#include <signal.h>
-#include <execinfo.h>
-
 #include "CmdOpt.hpp"
 #include "HttpServer.hpp"
 
