@@ -16,8 +16,8 @@
 
 namespace ytst {
 	class Stream {
-		std::string fifo_directory;
-		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
+		const std::string& fifo_directory;
+		std::shared_ptr<PythonSupervisor> python_supervisor;
 		std::atomic<bool>& stream_running;
 		HttpResponseWriter& writer;
 
