@@ -90,20 +90,29 @@ namespace ytst {
 				LOG(logDEBUG) << "Parse HTTP request finished";
 				map<string, string> query;
 				HttpParser::parse_query(query, request.query_string);
-				for (auto& h : request.headers) {
+				for (auto h : request.headers) {
 					LOG(logDEBUG) << "Header: " << h.first << ", " << h.second;
 				}
-				LOG(logDEBUG) << request.http_version;
+				for (auto q : query) {
+					LOG(logDEBUG) << "Query: " << q.first << ", " << q.second;
+				}
 				auto youtube_id = query.find("id");
+				auto chunked = query.find("chunked");
 				if (youtube_id == query.end()) {
 					std::string body = "Must pass youtube video id as query param 'id'";
 					writer.write_response(400, false, body);
 					headers_sent = true;
 				} else {
 					writer.header["Content-Type"] = "audio/mpeg";
-					// XXX: Hack! I can't get SONOS to work with chunked encoding, so just make the content-length really long
-					writer.header["Content-Length"] = "104857600";
-					writer.write_header(200, false, -1);
+					if (chunked != query.end() && chunked->second == "1") {
+						LOG(logDEBUG) << "Chunked encoding";
+						writer.write_header(200, true, -1);
+					} else {
+						// XXX: Hack! I can't get SONOS to work with chunked encoding, so just make the content-length really long
+						writer.header["Content-Length"] = "524288000";
+						writer.write_header(200, false, -1);
+					}
+
 					start_decode(youtube_id->second);
 					headers_sent = true;
 				}
