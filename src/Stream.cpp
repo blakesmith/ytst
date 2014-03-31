@@ -55,9 +55,8 @@ namespace ytst {
 			try {
 				encoder.encode_frame(frame, packet);
 				if (packet.packet.size > 0) {
-					auto buf = new Buffer(reinterpret_cast<const char*>(packet.packet.data),
-							      packet.packet.size);
-					writer.write_buffer(buf);
+					std::unique_ptr<Buffer> buf(new Buffer(reinterpret_cast<const char*>(packet.packet.data), packet.packet.size));
+					writer.write_buffer(std::move(buf));
 				}
 				packet.reset();
 			} catch(std::runtime_error e) {

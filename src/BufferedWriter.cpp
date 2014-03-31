@@ -9,19 +9,20 @@ namespace ytst {
 		notify_fn = notify;
 	}
 
-	int BufferedWriter::write_buffer(Buffer* buf) {
+	int BufferedWriter::write_buffer(std::unique_ptr<Buffer> buf) {
+		ssize_t len = buf->len;
 		std::lock_guard<std::mutex> lock(queue_mutex);
-		buffers.push(std::shared_ptr<Buffer>(buf));
+		buffers.push(std::move(buf));
 		notify_fn();
 
-		return buf->len;
+		return len;
 	}
 
-	std::shared_ptr<Buffer> BufferedWriter::get_buffer() {
+	std::unique_ptr<Buffer> BufferedWriter::get_buffer() {
 		std::lock_guard<std::mutex> lock(queue_mutex);
-		auto buf = buffers.front();
+		auto buf = std::move(buffers.front());
 		buffers.pop();
-		return buf;
+		return std::move(buf);
 	}
 
 	bool BufferedWriter::has_buffer() {

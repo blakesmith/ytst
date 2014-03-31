@@ -9,35 +9,35 @@ namespace ytst {
 	}
 
 	int HttpResponseWriter::write_response(int code, bool chunked, std::string& body) {
-		auto buf = new Buffer(body.c_str(), body.length());
-		write_buffer(code, chunked, buf);
+		std::unique_ptr<Buffer> buf(new Buffer(body.c_str(), body.length()));
+		write_buffer(code, chunked, std::move(buf));
 		return write_last_chunk();
 	}
 
-	int HttpResponseWriter::write_buffer(int code, bool chunked, Buffer* buf) {
+	int HttpResponseWriter::write_buffer(int code, bool chunked, std::unique_ptr<Buffer> buf) {
 		if (!headers_sent) {
 			write_header(code, chunked, buf->nbytes()+2);
 		}
 
 		if (chunked) {
-			write_chunked_buffer(buf);
+			write_chunked_buffer(std::move(buf));
 		} else {
-			writer.write_buffer(buf);
+			writer.write_buffer(std::move(buf));
 		}
 		
 		return 0;
 	}
 
-	int HttpResponseWriter::write_buffer(Buffer* buf) {
-		return write_buffer(HttpResponse::STATUS_OK, chunked, buf);
+	int HttpResponseWriter::write_buffer(std::unique_ptr<Buffer> buf) {
+		return write_buffer(HttpResponse::STATUS_OK, chunked, std::move(buf));
 	}
 
 	int HttpResponseWriter::write_last_chunk() {
 		if (chunked) {
-			return writer.write_buffer(new Buffer("0\r\n\r\n", 5));
+			return writer.write_buffer(std::unique_ptr<Buffer>(new Buffer("0\r\n\r\n", 5)));
 		}
 
-		return writer.write_buffer(new Buffer("\r\n", 2));
+		return writer.write_buffer(std::unique_ptr<Buffer>(new Buffer("\r\n", 2)));
 	}
 
 	int HttpResponseWriter::write_header(int code, bool chunked, ssize_t len) {
@@ -66,8 +66,8 @@ namespace ytst {
 			"HTTP/1.1 " + std::to_string(code) + " " + code_name + "\r\n"
 			+ headers + "\r\n";
 
-		Buffer* buf = new Buffer(header_response.c_str(), header_response.length());
-		writer.write_buffer(buf);
+		std::unique_ptr<Buffer> buf(new Buffer(header_response.c_str(), header_response.length()));
+		writer.write_buffer(std::move(buf));
 		headers_sent = true;
 
 		LOG(logDEBUG) << "HTTP headers sent";
@@ -75,7 +75,7 @@ namespace ytst {
 		return 0;
 	}
 
-	std::shared_ptr<Buffer> HttpResponseWriter::get_buffer() {
+	std::unique_ptr<Buffer> HttpResponseWriter::get_buffer() {
 		return writer.get_buffer();
 	}
 
@@ -83,15 +83,15 @@ namespace ytst {
 		return writer.has_buffer();
 	}
 
-	int HttpResponseWriter::write_chunked_buffer(Buffer* buf) {
+	int HttpResponseWriter::write_chunked_buffer(std::unique_ptr<Buffer> buf) {
 		char lbuf[16];
 		if (buf->nbytes() > UINT_MAX) {
 			return -1;
 		}
 		int lsize = snprintf(lbuf, 16, "%x\r\n", static_cast<unsigned int>(buf->nbytes()));
-		writer.write_buffer(new Buffer(lbuf, lsize));
-		writer.write_buffer(buf);
-		writer.write_buffer(new Buffer("\r\n", 2));
+		writer.write_buffer(std::unique_ptr<Buffer>(new Buffer(lbuf, lsize)));
+		writer.write_buffer(std::move(buf));
+		writer.write_buffer(std::unique_ptr<Buffer>(new Buffer("\r\n", 2)));
 
 		return 0;
 	}

@@ -41,7 +41,7 @@ namespace ytst {
 
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
 		auto buf = writer.get_buffer();
-		write_queue.push(buf);
+		write_queue.push(std::move(buf));
 		io_reset(EV_WRITE);
 		if (writer.has_buffer()) {
 			ev_async_send(loop, &notify);
