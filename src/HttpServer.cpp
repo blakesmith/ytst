@@ -5,6 +5,7 @@
 #include "Log.hpp"
 #include "HttpServer.hpp"
 #include "HttpClient.hpp"
+#include "YoutubeHandler.hpp"
 
 namespace ytst {
 	void HttpServer::io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {
@@ -31,7 +32,9 @@ namespace ytst {
 			return;
 		}
 
-		new HttpClient(options.fifo_directory, python_supervisor, loop, client_sd);
+		std::unique_ptr<HttpHandler> handler(new YoutubeHandler(options.fifo_directory, python_supervisor));
+
+		new HttpClient(std::move(handler), loop, client_sd);
 	}
 
 	void HttpServer::start() {

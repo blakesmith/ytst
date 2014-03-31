@@ -88,7 +88,7 @@ namespace ytst {
 			parser.execute(&request, buffer, nread+1, 0);
 			if (parser.is_finished()) {
 				LOG(logDEBUG) << "Parse HTTP request finished";
-				handler.serve(request, writer);
+				handler->serve(request, writer);
 				headers_sent = true;
 			}
 		}
@@ -107,13 +107,10 @@ namespace ytst {
 		LOG(logINFO) << "Client disconnected";
 	}
 
-	HttpClient::HttpClient(const std::string& fifo_directory,
-			       std::shared_ptr<PythonSupervisor> python_supervisor,
+	HttpClient::HttpClient(std::unique_ptr<HttpHandler> handler,
 			       struct ev_loop *loop,
 			       int s) : 
-		fifo_directory(fifo_directory),
-		python_supervisor(python_supervisor),
-		handler(fifo_directory, python_supervisor),
+		handler(std::move(handler)),
 		loop(loop),
 		sfd(s)
 	{

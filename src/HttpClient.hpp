@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "HttpParser.hpp"
-#include "YoutubeHandler.hpp"
+#include "HttpHandler.hpp"
 #include "PythonSupervisor.hpp"
 #include "HttpResponseWriter.hpp"
 #include "Stream.hpp"
@@ -17,10 +17,8 @@ namespace ytst {
 	private:
 		HttpRequest request;
 		HttpParser parser;
-		const std::string& fifo_directory;
-		std::shared_ptr<PythonSupervisor> python_supervisor;
 		HttpResponseWriter writer;
-		YoutubeHandler handler;
+		std::unique_ptr<HttpHandler> handler;
 
 		struct ev_loop *loop;
 		ev_io io;
@@ -40,8 +38,7 @@ namespace ytst {
 		void io_reset(int mode);
 		virtual ~HttpClient();
 	public:
-		HttpClient(const std::string& fifo_directory,
-			   std::shared_ptr<ytst::PythonSupervisor> python_supervisor,
+		HttpClient(std::unique_ptr<HttpHandler> handler,
 			   struct ev_loop *loop,
 			   int s);
 	};
