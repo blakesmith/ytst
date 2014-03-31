@@ -10,16 +10,16 @@ namespace ytst {
 		auto chunked = query.find("chunked");
 		if (youtube_id == query.end()) {
 			std::string body = "Must pass youtube video id as query param 'id'";
-			writer.write_response(400, false, body);
+			writer.write_response(HttpResponse::STATUS_BAD_REQUEST, false, body);
 			return;
 		} else {
 			writer.header["Content-Type"] = "audio/mpeg";
 			if (chunked != query.end() && chunked->second == "1") {
-				writer.write_header(200, true, -1);
+				writer.write_header(HttpResponse::STATUS_OK, true, -1);
 			} else {
 				// XXX: Hack! I can't get SONOS to work with chunked encoding, so just make the content-length really long
 				writer.header["Content-Length"] = "524288000";
-				writer.write_header(200, false, -1);
+				writer.write_header(HttpResponse::STATUS_OK, false, -1);
 			}
 
 			start_decode(youtube_id->second, writer);

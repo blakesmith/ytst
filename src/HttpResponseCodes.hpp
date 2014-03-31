@@ -7,6 +7,7 @@ namespace ytst {
 	class HttpResponse {
 	public:
 		static const int STATUS_OK = 200;
+		static const int STATUS_BAD_REQUEST = 400;
 
 		static const int get_name(const int code, string& out) {
 			switch (code) {
