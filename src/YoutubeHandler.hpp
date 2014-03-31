@@ -5,7 +5,7 @@
 #include <thread>
 #include <memory>
 
-#include "HttpHandler.hpp"
+#include "http/HttpHandler.hpp"
 #include "PythonSupervisor.hpp"
 
 namespace ytst {

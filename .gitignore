@@ -1,8 +1,17 @@
+=
 *.*~
 *.o
+*.lo
+*.la
+compile
+m4/lt*
+m4/libtool*
+ltmain.sh
 /aclocal.m4
 /autom4te.cache
 /config
+/config.guess
+/config.sub
 /config.log
 /config.status
 /configure
@@ -18,5 +27,6 @@ config.h.in
 depcomp
 install-sh
 missing
-src/.deps/
+*.deps*
+*.libs*
 stamp-h1

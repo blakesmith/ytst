@@ -7,9 +7,7 @@
 
 #include "HttpParser.hpp"
 #include "HttpHandler.hpp"
-#include "PythonSupervisor.hpp"
 #include "HttpResponseWriter.hpp"
-#include "Stream.hpp"
 #include "Buffer.hpp"
 
 namespace ytst {

@@ -1,6 +1,5 @@
 #include "YoutubeHandler.hpp"
 
-#include "HttpParser.hpp"
 #include "Stream.hpp"
 
 namespace ytst {

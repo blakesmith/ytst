@@ -1,7 +1,8 @@
 #include "CmdOpt.hpp"
-#include "HttpServer.hpp"
 
-#include "RouteHandler.hpp"
+#include "http/HttpServer.hpp"
+#include "http/RouteHandler.hpp"
+
 #include "YoutubeHandler.hpp"
 #include "PythonSupervisor.hpp"
 
