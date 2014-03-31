@@ -6,7 +6,9 @@ extern "C" {
 }
 
 #include "Log.hpp"
-#include "YTDownloader.hpp"
+
+#include "youtube/youtube_downloader.h"
+
 #include "Decoder.hpp"
 #include "MP3Encoder.hpp"
 #include "Packet.hpp"
@@ -36,7 +38,7 @@ namespace ytst {
 
 		LOG(logINFO) << "Starting video download";
 
-		ytst::YTDownloader downloader(url, infile, python_supervisor);
+		ytst::YoutubeDownloader downloader(url, infile, python_supervisor);
 		downloader.download();
 
 		LOG(logINFO) << "Starting decoder";

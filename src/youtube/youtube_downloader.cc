@@ -4,17 +4,17 @@
 #include <sys/wait.h>
 
 #include "Log.hpp"
-#include "YTDownloader.hpp"
+#include "youtube_downloader.h"
 
 namespace ytst {
-	YTDownloader::YTDownloader(const std::string& url,
-				   const std::string& out,
-				   std::shared_ptr<ytst::PythonSupervisor> python_supervisor) :
+	YoutubeDownloader::YoutubeDownloader(const std::string& url,
+					     const std::string& out,
+					     std::shared_ptr<ytst::PythonSupervisor> python_supervisor) :
 		url(url),
 		out(out),
 		python_supervisor(python_supervisor) { }
 
-	YTDownloader::~YTDownloader() {
+	YoutubeDownloader::~YoutubeDownloader() {
 		if (python_pid > 0) {
 			LOG(logDEBUG) << "About to kill child process with pid: " << python_pid;
 			kill(python_pid, SIGQUIT);
@@ -22,7 +22,7 @@ namespace ytst {
 		}
 	}
 
-	int YTDownloader::download() {
+	int YoutubeDownloader::download() {
 		python_pid = fork();
 		if (python_pid == 0) {
 			python = python_supervisor->new_python();
