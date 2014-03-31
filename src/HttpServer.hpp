@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "CmdOpt.hpp"
-#include "PythonSupervisor.hpp"
+#include "HttpHandler.hpp"
 
 namespace ytst {
 	class HttpServer {
@@ -16,14 +16,15 @@ namespace ytst {
 		struct ev_signal sio;
 		struct ev_loop *loop;
 		int s;
+		std::function<std::unique_ptr<HttpHandler>()> make_handler;
 
 		const Options& options;
-		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
 
 		void accept_cb(struct ev_loop *loop, ev_io *watcher, int revents);
 	public:
 		static void io_accept(struct ev_loop *loop, ev_io *watcher, int revents);
 		static void signal_cb(struct ev_loop *loop, ev_signal *signal, int revents);
+		void set_handler(std::function<std::unique_ptr<HttpHandler>()>);
 		void start();
 		HttpServer(const Options& options);
 		~HttpServer();

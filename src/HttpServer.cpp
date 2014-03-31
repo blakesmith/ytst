@@ -5,8 +5,6 @@
 #include "Log.hpp"
 #include "HttpServer.hpp"
 #include "HttpClient.hpp"
-#include "RouteHandler.hpp"
-#include "YoutubeHandler.hpp"
 
 namespace ytst {
 	void HttpServer::io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {
@@ -33,22 +31,18 @@ namespace ytst {
 			return;
 		}
 
-
-		auto handler = new RouteHandler();
-
-		handler->add_route("/stream", new YoutubeHandler(options.fifo_directory, python_supervisor));
-
-		new HttpClient(std::unique_ptr<HttpHandler>(handler), loop, client_sd);
+		new HttpClient(make_handler(), loop, client_sd);
 	}
 
 	void HttpServer::start() {
 		ev_loop(loop, 0);
 	}
 
-	HttpServer::HttpServer(const Options& options) : options(options) {
-		python_supervisor = std::make_shared<PythonSupervisor>();
-		python_supervisor->add_default_path(options.python_path);
+	void HttpServer::set_handler(std::function<std::unique_ptr<HttpHandler>()> handler) {
+		make_handler = handler;
+	}
 
+	HttpServer::HttpServer(const Options& options) : options(options) {
 		LOG(logINFO) << "Listening on port " << options.listen_port;
 
 		struct sockaddr_in addr;
