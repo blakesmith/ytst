@@ -5,9 +5,9 @@
 #include <list>
 #include <memory>
 
-#include "HttpParser.hpp"
-#include "HttpHandler.hpp"
-#include "HttpResponseWriter.hpp"
+#include "http_parser.h"
+#include "http_handler.h"
+#include "http_response_writer.h"
 #include "Buffer.hpp"
 
 namespace ytst {

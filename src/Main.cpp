@@ -1,7 +1,7 @@
 #include "CmdOpt.hpp"
 
-#include "http/HttpServer.hpp"
-#include "http/RouteHandler.hpp"
+#include "http/http_server.h"
+#include "http/http_route_handler.h"
 
 #include "YoutubeHandler.hpp"
 #include "PythonSupervisor.hpp"
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 	ytst::HttpServer server(opts);
 
 	server.set_handler([&opts, python_supervisor] {
-			auto handler = new ytst::RouteHandler();
+			auto handler = new ytst::HttpRouteHandler();
 
 			handler->add_route("/stream", new ytst::YoutubeHandler(opts.fifo_directory, python_supervisor));
 

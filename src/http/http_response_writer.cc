@@ -1,7 +1,7 @@
 #include <utility>
 
 #include "Log.hpp"
-#include "HttpResponseWriter.hpp"
+#include "http_response_writer.h"
 
 namespace ytst {
 	void HttpResponseWriter::add_callback(std::function<void()> notify) {

@@ -3,8 +3,8 @@
 #include <unistd.h>
 
 #include "Log.hpp"
-#include "HttpServer.hpp"
-#include "HttpClient.hpp"
+#include "http_server.h"
+#include "http_client.h"
 
 namespace ytst {
 	void HttpServer::io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {

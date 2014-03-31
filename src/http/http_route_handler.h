@@ -3,10 +3,10 @@
 
 #include <map>
 
-#include "HttpHandler.hpp"
+#include "http_handler.h"
 
 namespace ytst {
-	class RouteHandler : public HttpHandler {
+	class HttpRouteHandler : public HttpHandler {
 		std::map<std::string, std::unique_ptr<HttpHandler> > handles;
 
 		std::unique_ptr<HttpHandler> get_route(std::string path);

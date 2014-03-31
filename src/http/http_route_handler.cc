@@ -1,15 +1,15 @@
-#include "RouteHandler.hpp"
+#include "http_route_handler.h"
 
 namespace ytst {
-	void RouteHandler::add_route(std::string path, HttpHandler* handle) {
+	void HttpRouteHandler::add_route(std::string path, HttpHandler* handle) {
 		handles[path] = std::unique_ptr<HttpHandler>(handle);
 	}
 
-	std::unique_ptr<HttpHandler> RouteHandler::get_route(std::string path) {
+	std::unique_ptr<HttpHandler> HttpRouteHandler::get_route(std::string path) {
 		return std::move(handles[path]);
 	}
 
-	void RouteHandler::serve(HttpRequest& request, HttpResponseWriter& writer) {
+	void HttpRouteHandler::serve(HttpRequest& request, HttpResponseWriter& writer) {
 		auto handle = std::move(handles[request.request_path]);
 		if (handle == nullptr) {
 			std::string body = "Route '" + request.request_path + "' not found";

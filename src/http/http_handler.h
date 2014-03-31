@@ -3,8 +3,8 @@
 
 #include <map>
 
-#include "HttpRequest.hpp"
-#include "HttpResponseWriter.hpp"
+#include "http_request.h"
+#include "http_response_writer.h"
 
 namespace ytst {
 	class HttpHandler {

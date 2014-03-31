@@ -7,7 +7,7 @@
 #include <memory>
 
 #include "CmdOpt.hpp"
-#include "HttpHandler.hpp"
+#include "http_handler.h"
 
 namespace ytst {
 	class HttpServer {

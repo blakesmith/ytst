@@ -3,13 +3,14 @@ noinst_LTLIBRARIES = libytst_http.la
 
 libytst_http_la_SOURCES = \
 	http11_parser.h http11_parser.c \
-	HttpServer.hpp HttpServer.cpp \
-	HttpClient.hpp HttpClient.cpp \
-	HttpParser.hpp HttpParser.cpp \
-	HttpResponseWriter.hpp HttpResponseWriter.cpp \
-	HttpResponseCodes.hpp HttpHandler.hpp \
-	HttpHandler.cpp HttpRequest.hpp \
-	RouteHandler.hpp RouteHandler.cpp 
+	http_server.h http_server.cc \
+	http_client.h http_client.cc \
+	HttpParser.hpp http_parser.cc \
+	HttpResponseWriter.hpp http_response_writer.cc \
+	HttpResponseCodes.hpp \
+	http_handler.h http_handler.cc \
+	http_request.h \
+	http_route_handler.h http_route_handler.cc
 
 http11_parser.c:
 	$(RAGEL) http11_parser.rl

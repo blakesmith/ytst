@@ -5,7 +5,7 @@
 
 #include "BufferedWriter.hpp"
 #include "Writer.hpp"
-#include "HttpResponseCodes.hpp"
+#include "http_response_codes.h"
 
 using namespace std;
 

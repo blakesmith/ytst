@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "Log.hpp"
-#include "HttpClient.hpp"
+#include "http_client.h"
 
 #define READ_BUFFER_SIZE 1024
 

@@ -11,7 +11,7 @@
 #include <unistd.h>
 #include <atomic>
 
-#include "http/HttpResponseWriter.hpp"
+#include "http/http_response_writer.h"
 #include "PythonSupervisor.hpp"
 
 namespace ytst {

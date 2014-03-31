@@ -8,7 +8,7 @@ extern "C" {
 #include "http11_parser.h"
 }
 
-#include "HttpRequest.hpp"
+#include "http_request.h"
 
 using namespace std;
 
