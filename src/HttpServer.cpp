@@ -5,6 +5,7 @@
 #include "Log.hpp"
 #include "HttpServer.hpp"
 #include "HttpClient.hpp"
+#include "RouteHandler.hpp"
 #include "YoutubeHandler.hpp"
 
 namespace ytst {
@@ -32,9 +33,12 @@ namespace ytst {
 			return;
 		}
 
-		std::unique_ptr<HttpHandler> handler(new YoutubeHandler(options.fifo_directory, python_supervisor));
 
-		new HttpClient(std::move(handler), loop, client_sd);
+		auto handler = new RouteHandler();
+
+		handler->add_route("/stream", new YoutubeHandler(options.fifo_directory, python_supervisor));
+
+		new HttpClient(std::unique_ptr<HttpHandler>(handler), loop, client_sd);
 	}
 
 	void HttpServer::start() {

@@ -8,6 +8,7 @@ namespace ytst {
 	public:
 		static const int STATUS_OK = 200;
 		static const int STATUS_BAD_REQUEST = 400;
+		static const int STATUS_NOT_FOUND = 404;
 
 		static const int get_name(const int code, string& out) {
 			switch (code) {
@@ -16,6 +17,9 @@ namespace ytst {
 				return 0;
 			case 400:
 				out = "Bad Request";
+				return 0;
+			case 404:
+				out = "Not Found";
 				return 0;
 			default:
 				out = "OK";
