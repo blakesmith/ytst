@@ -88,48 +88,10 @@ namespace ytst {
 			parser.execute(&request, buffer, nread+1, 0);
 			if (parser.is_finished()) {
 				LOG(logDEBUG) << "Parse HTTP request finished";
-				map<string, string> query;
-				HttpParser::parse_query(query, request.query_string);
-				for (auto h : request.headers) {
-					LOG(logDEBUG) << "Header: " << h.first << ", " << h.second;
-				}
-				for (auto q : query) {
-					LOG(logDEBUG) << "Query: " << q.first << ", " << q.second;
-				}
-				auto youtube_id = query.find("id");
-				auto chunked = query.find("chunked");
-				if (youtube_id == query.end()) {
-					std::string body = "Must pass youtube video id as query param 'id'";
-					writer.write_response(400, false, body);
-					headers_sent = true;
-				} else {
-					writer.header["Content-Type"] = "audio/mpeg";
-					if (chunked != query.end() && chunked->second == "1") {
-						LOG(logDEBUG) << "Chunked encoding";
-						writer.write_header(200, true, -1);
-					} else {
-						// XXX: Hack! I can't get SONOS to work with chunked encoding, so just make the content-length really long
-						writer.header["Content-Length"] = "524288000";
-						writer.write_header(200, false, -1);
-					}
-
-					start_decode(youtube_id->second);
-					headers_sent = true;
-				}
+				handler.serve(request, writer);
+				headers_sent = true;
 			}
 		}
-	}
-
-	void HttpClient::start_decode(std::string& youtube_id) {
-		LOG(logINFO) << "Starting stream thread";
-		stream_running = true;
-		stream_thread = std::thread([=] {
-				ytst::Stream stream(fifo_directory,
-						    python_supervisor,
-						    stream_running,
-						    writer);
-				stream.stream(youtube_id);
-			});
 	}
 
 	void HttpClient::io_reset(int mode) {
@@ -139,11 +101,6 @@ namespace ytst {
 	}
 
 	HttpClient::~HttpClient() {
-		stream_running = false;
-		if (stream_thread.joinable()) {
-			stream_thread.join();
-		}
-
 		ev_io_stop(loop, &io);
 		ev_async_stop(loop, &notify);
 		close(sfd);
@@ -156,6 +113,7 @@ namespace ytst {
 			       int s) : 
 		fifo_directory(fifo_directory),
 		python_supervisor(python_supervisor),
+		handler(fifo_directory, python_supervisor),
 		loop(loop),
 		sfd(s)
 	{

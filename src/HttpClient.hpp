@@ -3,11 +3,10 @@
 
 #include <ev++.h>
 #include <list>
-#include <thread>
 #include <memory>
-#include <atomic>
 
 #include "HttpParser.hpp"
+#include "YoutubeHandler.hpp"
 #include "PythonSupervisor.hpp"
 #include "HttpResponseWriter.hpp"
 #include "Stream.hpp"
@@ -19,10 +18,9 @@ namespace ytst {
 		HttpRequest request;
 		HttpParser parser;
 		const std::string& fifo_directory;
-		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
+		std::shared_ptr<PythonSupervisor> python_supervisor;
 		HttpResponseWriter writer;
-		std::thread stream_thread;
-		std::atomic<bool> stream_running;
+		YoutubeHandler handler;
 
 		struct ev_loop *loop;
 		ev_io io;
