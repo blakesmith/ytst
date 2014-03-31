@@ -3,7 +3,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 
-#include "Log.hpp"
+#include "log.h"
 #include "youtube_downloader.h"
 
 namespace ytst {

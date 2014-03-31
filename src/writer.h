@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "stream/packet.h"
-#include "Buffer.hpp"
+#include "buffer.h"
 
 namespace ytst {
 	class Writer {

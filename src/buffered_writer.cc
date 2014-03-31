@@ -1,4 +1,4 @@
-#include "BufferedWriter.hpp"
+#include "buffered_writer.h"
 
 namespace ytst {
 	BufferedWriter::BufferedWriter() { }

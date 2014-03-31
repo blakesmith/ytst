@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "Log.hpp"
+#include "log.h"
 #include "http_client.h"
 
 #define READ_BUFFER_SIZE 1024

@@ -1,4 +1,4 @@
-#include "CmdOpt.hpp"
+#include "cmd_opt.h"
 
 #include <getopt.h>
 #include <cstring>

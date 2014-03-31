@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "Buffer.hpp"
+#include "buffer.h"
 
 namespace ytst {
 	Buffer::Buffer(const char *bytes, ssize_t nbytes) {

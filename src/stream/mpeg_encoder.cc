@@ -1,6 +1,4 @@
-#include <iostream>
-
-#include "Log.hpp"
+#include "log.h"
 #include "mpeg_encoder.h"
 
 namespace ytst {

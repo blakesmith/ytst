@@ -5,7 +5,7 @@
 #include <queue>
 #include <mutex>
 
-#include "Writer.hpp"
+#include "writer.h"
 
 using namespace std;
 

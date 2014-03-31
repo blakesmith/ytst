@@ -1,6 +1,6 @@
 #include "youtube_handler.h"
 
-#include "Stream.hpp"
+#include "stream/stream.h"
 
 namespace ytst {
 	void YoutubeHandler::serve(HttpRequest& request, HttpResponseWriter& writer) {

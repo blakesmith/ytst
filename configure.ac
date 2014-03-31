@@ -4,7 +4,7 @@
 AC_PREREQ([2.68])
 AC_INIT([YTST], [0.0.8])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
-AC_CONFIG_SRCDIR([src/Main.cpp])
+AC_CONFIG_SRCDIR([src/main.cc])
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 

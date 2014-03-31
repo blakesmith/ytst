@@ -1,4 +1,4 @@
-SUBDIRS = http python
+SUBDIRS = http python youtube stream
 EXTRA_DIST=ytst.init python/youtube-dl
 RAGEL=ragel
 AM_CXXFLAGS=$(ffmpeg_CFLAGS) $(PYTHON_CPPFLAGS) $(PTHREAD_CFLAGS) -Wall -pedantic -D__STDC_CONSTANT_MACROS
@@ -6,12 +6,12 @@ bin_PROGRAMS=ytst
 ytst_C_SOURCES = uuid.h uuid.c
 ytst_SOURCES= \
 	$(ytst_C_SOURCES) \
-	Main.cpp \
-	Log.hpp \
-	CmdOpt.hpp CmdOpt.cpp \
-	Buffer.hpp Buffer.cpp \
-	Writer.hpp \
-	BufferedWriter.hpp BufferedWriter.cpp
+	main.cc \
+	log.h \
+	cmd_opt.h cmd_opt.cc \
+	buffer.h buffer.cc \
+	writer.h \
+	buffered_writer.h buffered_writer.cc
 
 ytst_LDADD=$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS) \
 	http/libytst_http.la \

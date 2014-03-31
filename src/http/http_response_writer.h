@@ -3,8 +3,7 @@
 
 #include <map>
 
-#include "BufferedWriter.hpp"
-#include "Writer.hpp"
+#include "buffered_writer.h"
 #include "http_response_codes.h"
 
 using namespace std;

@@ -5,7 +5,7 @@ extern "C" {
 #include "uuid.h"
 }
 
-#include "Log.hpp"
+#include "log.h"
 
 #include "stream.h"
 
