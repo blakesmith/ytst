@@ -11,7 +11,7 @@ namespace ytst {
 	public:
 		virtual void serve(HttpRequest& request, HttpResponseWriter& writer) = 0;
 	protected:
-		int parse_query(std::map<std::string, std::string>& res, std::string& q);
+		std::map<std::string, std::string>  parse_query(std::string& q);
 
 	};
 }

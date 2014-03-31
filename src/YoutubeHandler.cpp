@@ -5,8 +5,7 @@
 
 namespace ytst {
 	void YoutubeHandler::serve(HttpRequest& request, HttpResponseWriter& writer) {
-		std::map<std::string, std::string> query;
-		parse_query(query, request.query_string);
+		auto query = parse_query(request.query_string);
 		auto youtube_id = query.find("id");
 		auto chunked = query.find("chunked");
 		if (youtube_id == query.end()) {

@@ -1,7 +1,8 @@
 #include "HttpHandler.hpp"
 
 namespace ytst {
-	int HttpHandler::parse_query(std::map<std::string, std::string>& res, std::string& q) {
+	std::map<std::string, std::string> HttpHandler::parse_query(std::string& q) {
+		std::map<std::string, std::string> res;
 		bool has_more = true;
 		string::size_type pos = 0;
 		string::size_type end_pos;
@@ -24,6 +25,6 @@ namespace ytst {
 			pos = end_pos+1;
 		}
 
-		return 0;
+		return res;
 	}
 }
