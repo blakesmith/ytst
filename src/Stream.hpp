@@ -12,7 +12,7 @@
 #include <atomic>
 
 #include "http/http_response_writer.h"
-#include "PythonSupervisor.hpp"
+#include "python/python_supervisor.h"
 
 namespace ytst {
 	class Stream {

@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-#include "PythonSupervisor.hpp"
+#include "python/python_supervisor.h"
 
 namespace ytst {
 	class YTDownloader {
@@ -13,7 +13,7 @@ namespace ytst {
 		pid_t python_pid;
 
 		std::shared_ptr<ytst::PythonSupervisor> python_supervisor;
-		std::shared_ptr<ytst::Python> python;
+		std::shared_ptr<ytst::PythonExecutor> python;
 	public:
 		YTDownloader(const std::string& url,
 			     const std::string& out,

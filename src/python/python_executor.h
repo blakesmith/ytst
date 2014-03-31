@@ -29,12 +29,12 @@ namespace ytst {
 		}
 	};
 
-	class Python {
+	class PythonExecutor {
 		PyGILState_STATE gil;
 		std::shared_ptr<PyObject> make_arguments(std::vector<std::string> args);
 	public:
-		Python();
-		~Python();
+		PythonExecutor();
+		~PythonExecutor();
 		void add_path(const char* path);
 		std::shared_ptr<PyObject> import_module(const char* module);
 		std::shared_ptr<PyObject> call_func(PyObject* module, const char* func, std::vector<std::string> args);

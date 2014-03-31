@@ -1,12 +1,10 @@
-SUBDIRS = http
+SUBDIRS = http python
 EXTRA_DIST=ytst.init python/youtube-dl
 RAGEL=ragel
-AM_CXXFLAGS=$(LIBEV_CFLAGS) $(ffmpeg_CFLAGS) $(PYTHON_CPPFLAGS) $(PTHREAD_CFLAGS) -Wall -pedantic -D__STDC_CONSTANT_MACROS
+AM_CXXFLAGS=$(ffmpeg_CFLAGS) $(PYTHON_CPPFLAGS) $(PTHREAD_CFLAGS) -Wall -pedantic -D__STDC_CONSTANT_MACROS
 bin_PROGRAMS=ytst
 ytst_C_SOURCES = uuid.h uuid.c
 ytst_SOURCES= \
-	PythonSupervisor.hpp PythonSupervisor.cpp \
-	Python.hpp Python.cpp \
 	$(ytst_C_SOURCES) \
 	Main.cpp \
 	Log.hpp \
@@ -23,7 +21,8 @@ ytst_SOURCES= \
 	YoutubeHandler.hpp YoutubeHandler.cpp
 
 ytst_LDADD=$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS) \
-	http/libytst_http.la
+	http/libytst_http.la \
+	python/libytst_python.la
 
 install-exec-hook:
 	cp $(srcdir)/ytst.init /etc/init.d/ytst

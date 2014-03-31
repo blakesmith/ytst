@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "http/http_handler.h"
-#include "PythonSupervisor.hpp"
+#include "python/python_supervisor.h"
 
 namespace ytst {
 	class YoutubeHandler : public HttpHandler {

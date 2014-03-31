@@ -1,7 +1,7 @@
 #include "Log.hpp"
 
 
-#include "PythonSupervisor.hpp"
+#include "python_supervisor.h"
 
 namespace ytst {
 	PythonSupervisor::PythonSupervisor() {}
@@ -11,12 +11,12 @@ namespace ytst {
 		default_paths.push_back(path);
 	}
 
-	std::shared_ptr<Python> PythonSupervisor::new_python() {
-		auto python = std::make_shared<Python>();
+	std::unique_ptr<PythonExecutor> PythonSupervisor::new_python() {
+		auto python = std::unique_ptr<PythonExecutor>(new PythonExecutor);
 		for (auto path : default_paths) {
 			python->add_path(path.c_str());
 		}
 
-		return python;
+		return std::move(python);
 	}
 }

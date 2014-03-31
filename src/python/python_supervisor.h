@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 
-#include "Python.hpp"
+#include "python_executor.h"
 
 namespace ytst {
 	class PythonSupervisor {
@@ -14,7 +14,7 @@ namespace ytst {
 		PythonSupervisor();
 		~PythonSupervisor();
 		void add_default_path(std::string path);
-		std::shared_ptr<Python> new_python();
+		std::unique_ptr<PythonExecutor> new_python();
 	};
 }
 

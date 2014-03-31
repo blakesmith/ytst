@@ -1,21 +1,21 @@
 #include <stdexcept>
 #include <iostream>
 
-#include "Python.hpp"
+#include "python_executor.h"
 #include "Log.hpp"
 
 namespace ytst {
-	Python::Python() {
+	PythonExecutor::PythonExecutor() {
 		Py_Initialize();
 		PyEval_InitThreads();
 		PyEval_SaveThread();
 	}
 
-	Python::~Python() {
+	PythonExecutor::~PythonExecutor() {
 		Py_Finalize();
 	}
 
-	void Python::add_path(const char* path) {
+	void PythonExecutor::add_path(const char* path) {
 		GilLock lock(&gil);
 		PyObject* sys = PyImport_ImportModule("sys");
 		PyObject* pPath = PyObject_GetAttrString(sys, "path");
@@ -26,14 +26,14 @@ namespace ytst {
 		Py_DECREF(new_path);
 	}
 
-	void Python::interrupt() {
+	void PythonExecutor::interrupt() {
 		GilLock lock(&gil);
 		LOG(logDEBUG) << "About to interrupt Python";
 		Py_AddPendingCall([](void *) { PyErr_SetInterrupt(); return -1; }, nullptr);
 		LOG(logDEBUG) << "Python sent interrupt";
 	}
 
-	std::shared_ptr<PyObject> Python::import_module(const char* module) {
+	std::shared_ptr<PyObject> PythonExecutor::import_module(const char* module) {
 		GilLock lock(&gil);
 		PyObject* pName = PyString_FromString(module);
 		PyObject* pModule = PyImport_Import(pName);
@@ -48,7 +48,7 @@ namespace ytst {
 						 });
 	}
 	
-	std::shared_ptr<PyObject> Python::call_func(PyObject* module, const char* func, std::vector<std::string> args) {
+	std::shared_ptr<PyObject> PythonExecutor::call_func(PyObject* module, const char* func, std::vector<std::string> args) {
 		GilLock lock(&gil);
 		std::unique_ptr<PyObject, std::function<void(PyObject*)>>
 			pFunc(PyObject_GetAttrString(module, func),
@@ -82,7 +82,7 @@ namespace ytst {
 		return nullptr;
 	}
 
-	std::shared_ptr<PyObject> Python::make_arguments(std::vector<std::string> args) {
+	std::shared_ptr<PyObject> PythonExecutor::make_arguments(std::vector<std::string> args) {
 		PyObject* tuple = PyTuple_New(1);
 		PyObject* list = PyList_New(args.size());
 

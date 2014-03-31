@@ -5,7 +5,6 @@
 
 #include "Log.hpp"
 #include "YTDownloader.hpp"
-#include "PythonSupervisor.hpp"
 
 namespace ytst {
 	YTDownloader::YTDownloader(const std::string& url,
