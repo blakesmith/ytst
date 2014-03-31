@@ -8,11 +8,6 @@ ytst_SOURCES= \
 	$(ytst_C_SOURCES) \
 	Main.cpp \
 	Log.hpp \
-	Encoder.hpp \
-	Packet.hpp Packet.cpp \
-	Decoder.hpp Decoder.cpp \
-	MP3Encoder.hpp MP3Encoder.cpp \
-	Stream.hpp Stream.cpp \
 	CmdOpt.hpp CmdOpt.cpp \
 	Buffer.hpp Buffer.cpp \
 	Writer.hpp \
@@ -21,7 +16,8 @@ ytst_SOURCES= \
 ytst_LDADD=$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS) \
 	http/libytst_http.la \
 	python/libytst_python.la \
-	youtube/libytst_youtube.la
+	youtube/libytst_youtube.la \
+	stream/libytst_stream.la
 
 install-exec-hook:
 	cp $(srcdir)/ytst.init /etc/init.d/ytst

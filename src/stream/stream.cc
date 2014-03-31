@@ -7,13 +7,14 @@ extern "C" {
 
 #include "Log.hpp"
 
+#include "stream.h"
+
 #include "youtube/youtube_downloader.h"
 
-#include "Decoder.hpp"
-#include "MP3Encoder.hpp"
-#include "Packet.hpp"
+#include "decoder.h"
+#include "mpeg_encoder.h"
+#include "packet.h"
 
-#include "Stream.hpp"
 
 const size_t UUID_LENGTH = 36;
 
@@ -46,7 +47,7 @@ namespace ytst {
 		auto decoder_ctxt = decoder.read_file();
 
 		LOG(logINFO) << "Starting encoder";
-		ytst::MP3Encoder encoder(decoder_ctxt);
+		ytst::MPEGEncoder encoder(decoder_ctxt);
 		encoder.open_encoder();
 		
 		AVFrame* frame;

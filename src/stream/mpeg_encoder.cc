@@ -1,12 +1,12 @@
 #include <iostream>
 
 #include "Log.hpp"
-#include "MP3Encoder.hpp"
+#include "mpeg_encoder.h"
 
 namespace ytst {
-	MP3Encoder::MP3Encoder(std::shared_ptr<AVCodecContext> ctxt) : decoder_context(ctxt) { }
+	MPEGEncoder::MPEGEncoder(std::shared_ptr<AVCodecContext> ctxt) : decoder_context(ctxt) { }
 
-	void MP3Encoder::open_encoder() {
+	void MPEGEncoder::open_encoder() {
 #if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(55, 28, 1)
 		const auto codec = avcodec_find_encoder(AV_CODEC_ID_MP3);
 #else
@@ -37,7 +37,7 @@ namespace ytst {
 		LOG(logINFO) << "Encoder frame size: " << encoder_context->frame_size;
 	}
 
-	int MP3Encoder::encode_frame(AVFrame* frame, Packet& packet) {
+	int MPEGEncoder::encode_frame(AVFrame* frame, Packet& packet) {
 		int has_output, ret;
 		ret = avcodec_encode_audio2(encoder_context.get(),
 					    &packet.packet,
@@ -54,7 +54,7 @@ namespace ytst {
 	}
 
 	/* just pick the highest supported samplerate */
-	int MP3Encoder::select_sample_rate(AVCodec *codec)
+	int MPEGEncoder::select_sample_rate(AVCodec *codec)
 	{
 		const int *p;
 		int best_samplerate = 0;
@@ -71,7 +71,7 @@ namespace ytst {
 	}
 
         /* select layout with the highest channel count */
-	int MP3Encoder::select_channel_layout(AVCodec *codec)
+	int MPEGEncoder::select_channel_layout(AVCodec *codec)
 	{
 		const uint64_t *p;
 		uint64_t best_ch_layout = 0;

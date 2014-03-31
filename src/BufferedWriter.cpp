@@ -1,4 +1,3 @@
-
 #include "BufferedWriter.hpp"
 
 namespace ytst {

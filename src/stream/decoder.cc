@@ -4,7 +4,7 @@
 #include <memory>
 
 #include "Log.hpp"
-#include "Decoder.hpp"
+#include "decoder.h"
 
 namespace ytst {
 	Decoder::Decoder(const std::string& infile) : infile(infile) {

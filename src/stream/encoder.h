@@ -1,7 +1,7 @@
 #ifndef YTST_ENCODER_HPP
 #define YTST_ENCODER_HPP
 
-#include "Packet.hpp"
+#include "packet.h"
 
 extern "C" {
 #include <libavformat/avformat.h>

@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <utility>
 
-#include "Packet.hpp"
+#include "packet.h"
 
 namespace ytst {
 	Packet::Packet() {

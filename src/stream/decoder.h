@@ -4,7 +4,7 @@
 #include <string>
 #include <memory>
 
-#include "Packet.hpp"
+#include "packet.h"
 
 extern "C" {
 #include <libavformat/avformat.h>

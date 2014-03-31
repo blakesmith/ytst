@@ -4,22 +4,22 @@
 #include <memory>
 #include <stdexcept>
 
-#include "Encoder.hpp"
-#include "Packet.hpp"
+#include "encoder.h"
+#include "packet.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
 }
 
 namespace ytst {
-	class MP3Encoder : Encoder {
+	class MPEGEncoder : Encoder {
 		std::shared_ptr<AVCodecContext> decoder_context;
 		std::shared_ptr<AVCodecContext> encoder_context;
 
 		int select_sample_rate(AVCodec* codec);
 		int select_channel_layout(AVCodec* codec);
 	public:
-		MP3Encoder(std::shared_ptr<AVCodecContext> ctxt);
+		MPEGEncoder(std::shared_ptr<AVCodecContext> ctxt);
 		void open_encoder();
 		int encode_frame(AVFrame* frame, Packet& packet);
 	};

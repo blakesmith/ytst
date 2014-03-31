@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "Packet.hpp"
+#include "stream/packet.h"
 #include "Buffer.hpp"
 
 namespace ytst {
