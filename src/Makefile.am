@@ -14,8 +14,8 @@ ytst_SOURCES= \
 	buffered_writer.h buffered_writer.cc
 
 ytst_LDADD= \
-	stream/libytst_stream.la \
 	youtube/libytst_youtube.la \
+	stream/libytst_stream.la \
 	http/libytst_http.la \
 	python/libytst_python.la \
 	$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS)
