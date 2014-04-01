@@ -1,6 +1,6 @@
 #include "youtube_handler.h"
 
-#include "stream/stream.h"
+#include "youtube_stream.h"
 
 namespace ytst {
 	void YoutubeHandler::serve(HttpRequest& request, HttpResponseWriter& writer) {
@@ -28,7 +28,7 @@ namespace ytst {
 	void YoutubeHandler::start_decode(std::string& youtube_id, HttpResponseWriter& writer) {
 		stream_running = true;
 		stream_thread = std::thread([this,&writer,youtube_id] {
-				ytst::Stream stream(fifo_directory,
+				ytst::YoutubeStream stream(fifo_directory,
 						    python_supervisor,
 						    stream_running,
 						    writer);

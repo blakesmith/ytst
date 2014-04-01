@@ -7,19 +7,18 @@ extern "C" {
 
 #include "log.h"
 
-#include "stream.h"
+#include "youtube_stream.h"
+#include "youtube_downloader.h"
 
-#include "youtube/youtube_downloader.h"
-
-#include "decoder.h"
-#include "mpeg_encoder.h"
-#include "packet.h"
+#include "stream/decoder.h"
+#include "stream/mpeg_encoder.h"
+#include "stream/packet.h"
 
 
 const size_t UUID_LENGTH = 36;
 
 namespace ytst {
-	Stream::Stream(const std::string& fifo_directory,
+	YoutubeStream::YoutubeStream(const std::string& fifo_directory,
 		       std::shared_ptr<PythonSupervisor> python_supervisor,
 		       std::atomic<bool>& stream_running,
 		       HttpResponseWriter& writer) : 
@@ -28,14 +27,14 @@ namespace ytst {
 		stream_running(stream_running),
 		writer(writer) { }
 
-	Stream::~Stream() {
+	YoutubeStream::~YoutubeStream() {
 	}
 
-	void Stream::stream(const std::string& id) {
+	void YoutubeStream::stream(const std::string& id) {
 		std::string infile = fifo_location();
 		std::string url = youtube_url(id);
 
-		ytst::Stream::Fifo fifo(infile);
+		ytst::YoutubeStream::Fifo fifo(infile);
 
 		LOG(logINFO) << "Starting video download";
 
@@ -71,16 +70,16 @@ namespace ytst {
 		LOG(logINFO) << "Done decoding";
 	}
 
-	std::string Stream::youtube_url(const std::string& id) {
+	std::string YoutubeStream::youtube_url(const std::string& id) {
 		return std::string("https://www.youtube.com/watch?v=") + id;
 	}
 
-	std::string Stream::fifo_location() {
+	std::string YoutubeStream::fifo_location() {
 		// XXX: Not OS independent!
 		return std::string(fifo_directory + "/" + stream_id() + ".mp4");
 	}
 	
-	std::string Stream::stream_id() {
+	std::string YoutubeStream::stream_id() {
 		char buf[UUID_LENGTH];
 		afsUUID uuid;
 

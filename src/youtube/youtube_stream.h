@@ -15,7 +15,7 @@
 #include "python/python_supervisor.h"
 
 namespace ytst {
-	class Stream {
+	class YoutubeStream {
 		const std::string& fifo_directory;
 		std::shared_ptr<PythonSupervisor> python_supervisor;
 		std::atomic<bool>& stream_running;
@@ -40,11 +40,11 @@ namespace ytst {
 		};
 
 	public:
-		Stream(const std::string& fifo_directory,
+		YoutubeStream(const std::string& fifo_directory,
 		       std::shared_ptr<PythonSupervisor> python_supervisor,
 		       std::atomic<bool>& stream_running,
 		       HttpResponseWriter& writer);
-		~Stream();
+		~YoutubeStream();
 
 		void stream(const std::string& id);
 	};

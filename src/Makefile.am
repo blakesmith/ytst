@@ -13,11 +13,12 @@ ytst_SOURCES= \
 	writer.h \
 	buffered_writer.h buffered_writer.cc
 
-ytst_LDADD=$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS) \
+ytst_LDADD= \
+	stream/libytst_stream.la \
+	youtube/libytst_youtube.la \
 	http/libytst_http.la \
 	python/libytst_python.la \
-	youtube/libytst_youtube.la \
-	stream/libytst_stream.la
+	$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS)
 
 install-exec-hook:
 	cp $(srcdir)/ytst.init /etc/init.d/ytst
