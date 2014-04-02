@@ -20,6 +20,7 @@ namespace ytst {
 	class HttpClient {
 	private:
 		SocketDesc sd;
+		std::queue<std::shared_ptr<Buffer>> write_queue;
 
 		HttpRequest request;
 		HttpParser parser;
@@ -28,7 +29,6 @@ namespace ytst {
 		struct ev_loop *loop;
 		EvAsync notify;
 		EvIo io;
-		std::queue<std::shared_ptr<Buffer>> write_queue;
 
 		std::unique_ptr<HttpHandler> handler;
 
