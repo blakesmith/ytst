@@ -7,7 +7,8 @@ clean-all:
 pkg: all
 	sudo checkinstall --pkgname=$(PACKAGE) \
 			  --pkgversion=$(VERSION) \
-			  --default
+			  --default \
+			  --strip=no
 
 if BUILDING_DEB
 DEBSOURCEPKG=$(PACKAGE)_$(VERSION).orig.tar.gz
