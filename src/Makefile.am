@@ -12,7 +12,9 @@ ytst_SOURCES= \
 	buffer.h buffer.cc \
 	writer.h \
 	buffered_writer.h buffered_writer.cc \
-	ev_async.h ev_async.cc
+	ev_io.h ev_io.cc \
+	ev_async.h ev_async.cc \
+	socket_desc.h socket_desc.cc
 
 ytst_LDADD= \
 	youtube/libytst_youtube.la \

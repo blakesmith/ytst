@@ -1,5 +1,4 @@
 #include <fcntl.h>
-#include <unistd.h>
 #include <iostream>
 
 #include "log.h"
@@ -33,9 +32,9 @@ namespace ytst {
 		}
 
 		if (write_queue.empty()) {
-			io_reset(EV_READ);
+			io.reset(EV_READ);
 		} else {
-			io_reset(EV_READ | EV_WRITE);
+			io.reset(EV_READ | EV_WRITE);
 		}
 	}
 
@@ -45,12 +44,12 @@ namespace ytst {
 			write_queue.push(buf);
 		}
 
-		io_reset(EV_WRITE);
+		io.reset(EV_WRITE);
 	}
 
 	void HttpClient::write_cb(ev_io *watcher) {
 		if (write_queue.empty()) {
-			io_reset(EV_READ);
+			io.reset(EV_READ);
 			return;
 		}
 		auto buffer = write_queue.front();
@@ -94,15 +93,7 @@ namespace ytst {
 		}
 	}
 
-	void HttpClient::io_reset(int mode) {
-		ev_io_stop(loop, &io);
-		ev_io_set(&io, io.fd, mode);
-		ev_io_start(loop, &io);
-	}
-
 	HttpClient::~HttpClient() {
-		ev_io_stop(loop, &io);
-		close(sfd);
 		LOG(logINFO) << "Client disconnected";
 	}
 
@@ -111,25 +102,24 @@ namespace ytst {
 			       int s) : 
 		handler(std::move(handler)),
 		loop(loop),
+		sd(s),
 		notify(loop, notify_cb),
-		sfd(s)
+		io(loop, io_cb, sd.get())
 	{
 		headers_sent = false;
 
 		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
 		LOG(logINFO) << "Got connection";
 
-		io.data = reinterpret_cast<void *>(this);
+		io.set_data(reinterpret_cast<void *>(this));
 		notify.set_data(reinterpret_cast<void *>(this));
 
 		writer.add_callback([=] {
 				notify.send();
 			});
-
+		
 		notify.start();
-
-		ev_io_init(&io, io_cb, s, EV_READ);
-		ev_io_start(loop, &io);
+		io.start();
 	}
 }
 

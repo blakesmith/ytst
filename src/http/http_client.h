@@ -1,7 +1,10 @@
 #ifndef YTST_HTTP_CLIENT_HPP
 #define YTST_HTTP_CLIENT_HPP
 
-#include <ev++.h>
+extern "C" {
+#include <ev.h>
+}
+
 #include <list>
 #include <memory>
 
@@ -9,19 +12,22 @@
 #include "http_handler.h"
 #include "http_response_writer.h"
 #include "buffer.h"
+#include "ev_io.h"
 #include "ev_async.h"
+#include "socket_desc.h"
 
 namespace ytst {
 	class HttpClient {
 	private:
+		SocketDesc sd;
+
 		HttpRequest request;
 		HttpParser parser;
 		HttpResponseWriter writer;
 
 		struct ev_loop *loop;
 		EvAsync notify;
-		ev_io io;
-		int sfd;
+		EvIo io;
 		std::queue<std::shared_ptr<Buffer>> write_queue;
 
 		std::unique_ptr<HttpHandler> handler;
@@ -35,7 +41,6 @@ namespace ytst {
 		void write_cb(ev_io *watcher);
 		void read_cb(ev_io *watcher);
 		void start_decode(std::string& youtube_id);
-		void io_reset(int mode);
 		virtual ~HttpClient();
 	public:
 		HttpClient(std::unique_ptr<HttpHandler> handler,
