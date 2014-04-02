@@ -10,6 +10,7 @@ namespace ytst {
 	public:
 		EvAsync(struct ev_loop *loop, void(*cb)(EV_P_ struct ev_async *a, int revents));
 		void start();
+		void stop();
 		void send();
 		void set_data(void *data);
 				 
