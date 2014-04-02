@@ -17,13 +17,14 @@ namespace ytst {
 		HttpRequest request;
 		HttpParser parser;
 		HttpResponseWriter writer;
-		std::unique_ptr<HttpHandler> handler;
 
 		struct ev_loop *loop;
 		EvAsync notify;
 		ev_io io;
 		int sfd;
 		std::queue<std::shared_ptr<Buffer>> write_queue;
+
+		std::unique_ptr<HttpHandler> handler;
 
 		bool headers_sent;
 
