@@ -7,11 +7,15 @@ namespace ytst {
 	}
 
 	EvAsync::~EvAsync() {
-		ev_async_stop(loop, &async);
+		stop();
 	}
 
 	void EvAsync::start() {
 		ev_async_start(loop, &async);
+	}
+
+	void EvAsync::stop() {
+		ev_async_stop(loop, &async);
 	}
 
 	void EvAsync::send() {
