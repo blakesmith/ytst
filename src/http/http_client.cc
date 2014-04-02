@@ -102,7 +102,6 @@ namespace ytst {
 
 	HttpClient::~HttpClient() {
 		ev_io_stop(loop, &io);
-		ev_async_stop(loop, &notify);
 		close(sfd);
 		LOG(logINFO) << "Client disconnected";
 	}
@@ -112,6 +111,7 @@ namespace ytst {
 			       int s) : 
 		handler(std::move(handler)),
 		loop(loop),
+		notify(loop, notify_cb),
 		sfd(s)
 	{
 		headers_sent = false;
@@ -120,15 +120,13 @@ namespace ytst {
 		LOG(logINFO) << "Got connection";
 
 		io.data = reinterpret_cast<void *>(this);
-		notify.data = reinterpret_cast<void *>(this);
-
-		ev_async_init(&notify, notify_cb);
+		notify.set_data(reinterpret_cast<void *>(this));
 
 		writer.add_callback([=] {
-				ev_async_send(loop, &notify);
+				notify.send();
 			});
 
-		ev_async_start(loop, &notify);
+		notify.start();
 
 		ev_io_init(&io, io_cb, s, EV_READ);
 		ev_io_start(loop, &io);

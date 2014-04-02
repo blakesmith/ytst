@@ -11,7 +11,8 @@ ytst_SOURCES= \
 	cmd_opt.h cmd_opt.cc \
 	buffer.h buffer.cc \
 	writer.h \
-	buffered_writer.h buffered_writer.cc
+	buffered_writer.h buffered_writer.cc \
+	ev_async.h ev_async.cc
 
 ytst_LDADD= \
 	youtube/libytst_youtube.la \

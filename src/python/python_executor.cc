@@ -12,7 +12,7 @@ namespace ytst {
 	}
 
 	PythonExecutor::~PythonExecutor() {
-		Py_Finalize();
+//		Py_Finalize();
 	}
 
 	void PythonExecutor::add_path(const char* path) {

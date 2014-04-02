@@ -9,6 +9,7 @@
 #include "http_handler.h"
 #include "http_response_writer.h"
 #include "buffer.h"
+#include "ev_async.h"
 
 namespace ytst {
 	class HttpClient {
@@ -19,8 +20,8 @@ namespace ytst {
 		std::unique_ptr<HttpHandler> handler;
 
 		struct ev_loop *loop;
+		EvAsync notify;
 		ev_io io;
-		ev_async notify;
 		int sfd;
 		std::queue<std::shared_ptr<Buffer>> write_queue;
 

@@ -35,7 +35,12 @@ namespace ytst {
 			func_args.push_back(out);
 			func_args.push_back(url);
 
-			python->call_func(module.get(), "_real_main", func_args);
+			try {
+				python->call_func(module.get(), "_real_main", func_args);
+			} catch (ytst::PythonException e) {
+				exit(-1);
+			}
+
 			exit(0);
 		}
 
