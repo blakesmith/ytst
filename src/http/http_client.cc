@@ -9,12 +9,12 @@
 
 namespace ytst {
 	void HttpClient::io_cb(struct ev_loop *loop, ev_io *watcher, int revents) {
-		HttpClient *inst = (HttpClient *)watcher->data;
+		HttpClient *inst = reinterpret_cast<HttpClient*>(watcher->data);
 		inst->callback(loop, watcher, revents);
 	}
 	
 	void HttpClient::notify_cb(struct ev_loop *loop, ev_async *watcher, int revents) {
-		HttpClient *inst = (HttpClient *)watcher->data;
+		HttpClient *inst = reinterpret_cast<HttpClient*>(watcher->data);
 		inst->notify_callback(loop, watcher, revents);
 	}
 
@@ -40,12 +40,12 @@ namespace ytst {
 	}
 
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
-		auto buf = writer.get_buffer();
-		write_queue.push(buf);
-		io_reset(EV_WRITE);
-		if (writer.has_buffer()) {
-			ev_async_send(loop, &notify);
+		while (writer.has_buffer()) {
+			auto buf = writer.get_buffer();
+			write_queue.push(buf);
 		}
+
+		io_reset(EV_WRITE);
 	}
 
 	void HttpClient::write_cb(ev_io *watcher) {
