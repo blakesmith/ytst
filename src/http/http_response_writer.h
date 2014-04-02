@@ -13,8 +13,6 @@ namespace ytst {
 		BufferedWriter writer;
 		bool headers_sent;
 		bool chunked;
-
-		Buffer* make_chunk(Buffer* buf);
 	public:
 		map<string, string> header;
 
