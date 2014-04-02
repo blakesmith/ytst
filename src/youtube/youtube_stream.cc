@@ -46,7 +46,7 @@ namespace ytst {
 		auto decoder_ctxt = decoder.read_file();
 
 		LOG(logINFO) << "Starting encoder";
-		ytst::MPEGEncoder encoder(decoder_ctxt);
+		ytst::MPEGEncoder encoder(decoder_ctxt, MPEGEncoder::LAYER3, 128000);
 		encoder.open_encoder();
 		
 		AVFrame* frame;

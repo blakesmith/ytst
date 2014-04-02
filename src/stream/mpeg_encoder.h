@@ -13,15 +13,29 @@ extern "C" {
 
 namespace ytst {
 	class MPEGEncoder : Encoder {
+	public:
+		enum Format {
+			NONE,
+			LAYER2,
+			LAYER3
+		};
+
+		MPEGEncoder(std::shared_ptr<AVCodecContext> ctxt,
+			    Format format,
+			    int bit_rate);
+		void open_encoder();
+		int encode_frame(AVFrame* frame, Packet& packet);
+	private:
+
 		std::shared_ptr<AVCodecContext> decoder_context;
 		std::shared_ptr<AVCodecContext> encoder_context;
 
 		int select_sample_rate(AVCodec* codec);
 		int select_channel_layout(AVCodec* codec);
-	public:
-		MPEGEncoder(std::shared_ptr<AVCodecContext> ctxt);
-		void open_encoder();
-		int encode_frame(AVFrame* frame, Packet& packet);
+		enum AVCodecID format_to_codec(enum Format format);
+
+		int bit_rate;
+		Format format;
 	};
 }
 #endif

@@ -2,14 +2,15 @@
 #include "mpeg_encoder.h"
 
 namespace ytst {
-	MPEGEncoder::MPEGEncoder(std::shared_ptr<AVCodecContext> ctxt) : decoder_context(ctxt) { }
+	MPEGEncoder::MPEGEncoder(std::shared_ptr<AVCodecContext> ctxt,
+				 Format format,
+				 int bit_rate):
+		decoder_context(ctxt),
+		bit_rate(bit_rate),
+		format(format) { }
 
 	void MPEGEncoder::open_encoder() {
-#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(55, 28, 1)
-		const auto codec = avcodec_find_encoder(AV_CODEC_ID_MP3);
-#else
-		const auto codec = avcodec_find_encoder(CODEC_ID_MP3);
-#endif
+		const auto codec = avcodec_find_encoder(format_to_codec(format));
 		
 		if (codec == nullptr) {
 			LOG(logWARNING) << "Could not find audio codec!";
@@ -23,7 +24,7 @@ namespace ytst {
 								  });
 
 		encoder_context->sample_fmt = decoder_context->sample_fmt;
-		encoder_context->bit_rate = 128000;
+		encoder_context->bit_rate = bit_rate;
 		encoder_context->sample_rate = 44100;
 		encoder_context->channel_layout = select_channel_layout(codec);
 		encoder_context->channels = av_get_channel_layout_nb_channels(encoder_context->channel_layout);
@@ -89,5 +90,16 @@ namespace ytst {
 			p++;
 		}
 		return best_ch_layout;
+	}
+
+	enum AVCodecID MPEGEncoder::format_to_codec(enum Format format) {
+		switch (format) {
+		case LAYER3:
+#if LIBAVCODEC_VERSION_INT > AV_VERSION_INT(55, 28, 1)
+			return AV_CODEC_ID_MP3;
+#else
+			return CODEC_ID_MP3;
+#endif
+		}
 	}
 }
