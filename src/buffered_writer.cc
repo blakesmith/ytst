@@ -9,8 +9,8 @@ namespace ytst {
 	}
 
 	int BufferedWriter::write_buffer(std::shared_ptr<Buffer> buf) {
-		ssize_t len = buf->len;
 		std::lock_guard<std::mutex> lock(queue_mutex);
+		ssize_t len = buf->len;
 		buffers.push(buf);
 		notify_fn();
 
