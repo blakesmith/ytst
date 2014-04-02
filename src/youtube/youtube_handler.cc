@@ -1,3 +1,4 @@
+#include "log.h"
 #include "youtube_handler.h"
 
 #include "youtube_stream.h"
