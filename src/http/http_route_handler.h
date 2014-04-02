@@ -7,9 +7,7 @@
 
 namespace ytst {
 	class HttpRouteHandler : public HttpHandler {
-		std::map<std::string, std::unique_ptr<HttpHandler> > handles;
-
-		std::unique_ptr<HttpHandler> get_route(std::string path);
+		std::map<std::string, std::shared_ptr<HttpHandler> > handles;
 	public:
 		void add_route(std::string path, HttpHandler* handle);
 		virtual void serve(HttpRequest& request, HttpResponseWriter& writer);

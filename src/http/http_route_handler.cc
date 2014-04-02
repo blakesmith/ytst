@@ -2,15 +2,11 @@
 
 namespace ytst {
 	void HttpRouteHandler::add_route(std::string path, HttpHandler* handle) {
-		handles[path] = std::unique_ptr<HttpHandler>(handle);
-	}
-
-	std::unique_ptr<HttpHandler> HttpRouteHandler::get_route(std::string path) {
-		return std::move(handles[path]);
+		handles[path] = std::shared_ptr<HttpHandler>(handle);
 	}
 
 	void HttpRouteHandler::serve(HttpRequest& request, HttpResponseWriter& writer) {
-		auto handle = std::move(handles[request.request_path]);
+		auto handle = handles[request.request_path];
 		if (handle == nullptr) {
 			std::string body = "Route '" + request.request_path + "' not found";
 			writer.write_response(HttpResponse::STATUS_NOT_FOUND, false, body);
