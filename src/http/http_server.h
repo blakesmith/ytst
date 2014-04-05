@@ -10,6 +10,7 @@
 #include "http_handler.h"
 #include "ev/loop.h"
 #include "ev/io.h"
+#include "ev/sig.h"
 
 namespace ytst {
 	class HttpServer {
@@ -17,8 +18,8 @@ namespace ytst {
 		const Options& options;
 		int sock;
 		ev::Loop loop;
+		ev::Signal sio;
 		ev::Io io;
-		struct ev_signal sio;
 
 		int s;
 		std::function<std::unique_ptr<HttpHandler>()> make_handler;

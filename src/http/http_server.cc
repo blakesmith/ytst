@@ -73,14 +73,14 @@ namespace ytst {
 	HttpServer::HttpServer(const Options& options) :
 		options(options),
 		sock(listen_socket(options)),
+		sio(loop, signal_cb, SIGINT),
 		io(loop, io_accept, sock) {
 
 		io.set_data(reinterpret_cast<void*>(this));
 		io.start();
 
-		sio.data = reinterpret_cast<void*>(this);
-		ev_signal_init(&sio, signal_cb, SIGINT);
-		ev_signal_start(loop.get(), &sio);
+		sio.set_data(reinterpret_cast<void*>(this));
+		sio.start();
 	}
 
 	HttpServer::~HttpServer() {
