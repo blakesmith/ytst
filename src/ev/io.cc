@@ -1,7 +1,7 @@
 #include "io.h"
 
 namespace ev {
-	Io::Io(struct ev_loop *loop, void(*cb)(EV_P_ struct ev_io *a, int revents), int sd) : loop(loop)
+	Io::Io(Loop& loop, void(*cb)(EV_P_ struct ev_io *a, int revents), int sd) : loop(loop)
 	{
 		ev_io_init(&io, cb, sd, EV_READ);
 	}
@@ -11,11 +11,11 @@ namespace ev {
 	}
 
 	void Io::start() {
-		ev_io_start(loop, &io);
+		ev_io_start(loop.get(), &io);
 	}
 
 	void Io::stop() {
-		ev_io_stop(loop, &io);
+		ev_io_stop(loop.get(), &io);
 	}
 
 	void Io::set(int mode) {

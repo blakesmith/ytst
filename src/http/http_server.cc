@@ -7,16 +7,17 @@
 #include "http_client.h"
 
 namespace ytst {
-	void HttpServer::io_accept(struct ev_loop *loop, ev_io *watcher, int revents) {
+	void HttpServer::io_accept(struct ev_loop *l, ev_io *watcher, int revents) {
 		HttpServer* impl = reinterpret_cast<HttpServer*>(watcher->data);
-		impl->accept_cb(loop, watcher, revents);
+		impl->accept_cb(l, watcher, revents);
 	}
 
-	void HttpServer::signal_cb(struct ev_loop *loop, ev_signal *signal, int revents) {
-		ev_break(loop, EVBREAK_ALL);
+	void HttpServer::signal_cb(struct ev_loop *l, ev_signal *signal, int revents) {
+		HttpServer* impl = reinterpret_cast<HttpServer*>(signal->data);
+		impl->stop();
 	}
 
-	void HttpServer::accept_cb(struct ev_loop *loop, ev_io *watcher, int revents) {
+	void HttpServer::accept_cb(struct ev_loop *l, ev_io *watcher, int revents) {
 		if (EV_ERROR & revents) {
 			perror("Got invalid event.\n");
 			return;
@@ -35,41 +36,44 @@ namespace ytst {
 	}
 
 	void HttpServer::start() {
-		ev_loop(loop, 0);
+		loop.start();
+	}
+
+	void HttpServer::stop() {
+		loop.stop();
 	}
 
 	void HttpServer::set_handler(std::function<std::unique_ptr<HttpHandler>()> handler) {
 		make_handler = handler;
 	}
 
-	HttpServer::HttpServer(const Options& options) : options(options) {
+	HttpServer::HttpServer(const Options& options) :
+		options(options),
+		sock(socket(PF_INET, SOCK_STREAM, 0)),
+		loop(loop),
+		io(loop, io_accept, sock) {
 		LOG(logINFO) << "Listening on port " << options.listen_port;
 
 		struct sockaddr_in addr;
 		
-		s = socket(PF_INET, SOCK_STREAM, 0);
-
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(options.listen_port);
 		addr.sin_addr.s_addr = INADDR_ANY;
 
-		if (::bind(s, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+		if (::bind(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
 			perror("Failed to bind to port.\n");
 		}
 
-		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
+		fcntl(sock, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
 
-		listen(s, 5);
+		listen(sock, 5);
 
-		loop = ev_default_loop(0);
+		io.set_data(reinterpret_cast<void*>(this));
 
-		io.data = reinterpret_cast<void*>(this);
-
-		ev_io_init(&io, io_accept, s, EV_READ);
-		ev_io_start(loop, &io);
+		loop.start();
 
 		ev_signal_init(&sio, signal_cb, SIGINT);
-		ev_signal_start(loop, &sio);
+		ev_signal_start(loop.get(), &sio);
 	}
 
 	HttpServer::~HttpServer() {

@@ -98,7 +98,7 @@ namespace ytst {
 	}
 
 	HttpClient::HttpClient(std::unique_ptr<HttpHandler> handler,
-			       struct ev_loop *loop,
+			       ev::Loop& loop,
 			       int s) : 
 		handler(std::move(handler)),
 		loop(loop),

@@ -8,17 +8,20 @@
 
 #include "cmd_opt.h"
 #include "http_handler.h"
+#include "ev/loop.h"
+#include "ev/io.h"
 
 namespace ytst {
 	class HttpServer {
 	private:
-		struct ev_io io;
+		const Options& options;
+		int sock;
+		ev::Loop loop;
+		ev::Io io;
 		struct ev_signal sio;
-		struct ev_loop *loop;
+
 		int s;
 		std::function<std::unique_ptr<HttpHandler>()> make_handler;
-
-		const Options& options;
 
 		void accept_cb(struct ev_loop *loop, ev_io *watcher, int revents);
 	public:
@@ -26,6 +29,7 @@ namespace ytst {
 		static void signal_cb(struct ev_loop *loop, ev_signal *signal, int revents);
 		void set_handler(std::function<std::unique_ptr<HttpHandler>()>);
 		void start();
+		void stop();
 		HttpServer(const Options& options);
 		~HttpServer();
 	};

@@ -3,12 +3,14 @@
 
 #include <ev.h>
 
+#include "loop.h"
+
 namespace ev {
 	class Io {
-		struct ev_loop *loop;
+		Loop& loop;
 		ev_io io;
 	public:
-		Io(struct ev_loop *loop, void(*cb)(EV_P_ struct ev_io *a, int revents), int sd);
+		Io(Loop& loop, void(*cb)(EV_P_ struct ev_io *a, int revents), int sd);
 		void start();
 		void stop();
 		void set(int mode);

@@ -27,8 +27,7 @@ namespace ytst {
 		HttpParser parser;
 		HttpResponseWriter writer;
 
-		struct ev_loop *loop;
-
+		ev::Loop& loop;
 		ev::Async notify;
 		ev::Io io;
 
@@ -46,7 +45,7 @@ namespace ytst {
 		virtual ~HttpClient();
 	public:
 		HttpClient(std::unique_ptr<HttpHandler> handler,
-			   struct ev_loop *loop,
+			   ev::Loop& loop,
 			   int s);
 	};
 }

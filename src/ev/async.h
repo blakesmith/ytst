@@ -2,13 +2,14 @@
 #define YTST_EV_ASYNC_H
 
 #include <ev.h>
+#include "loop.h"
 
 namespace ev {
 	class Async {
-		struct ev_loop *loop;
+		Loop& loop;
 		ev_async async;
 	public:
-		Async(struct ev_loop *loop, void(*cb)(EV_P_ struct ev_async *a, int revents));
+		Async(Loop& loop, void(*cb)(EV_P_ struct ev_async *a, int revents));
 		void start();
 		void stop();
 		void send();
