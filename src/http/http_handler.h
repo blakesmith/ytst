@@ -10,6 +10,7 @@ namespace ytst {
 	class HttpHandler {
 	public:
 		virtual void serve(HttpRequest& request, HttpResponseWriter& writer) = 0;
+		virtual ~HttpHandler() {};
 	protected:
 		std::map<std::string, std::string>  parse_query(std::string& q);
 
