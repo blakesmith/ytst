@@ -47,31 +47,38 @@ namespace ytst {
 		make_handler = handler;
 	}
 
-	HttpServer::HttpServer(const Options& options) :
-		options(options),
-		sock(socket(PF_INET, SOCK_STREAM, 0)),
-		loop(loop),
-		io(loop, io_accept, sock) {
-		LOG(logINFO) << "Listening on port " << options.listen_port;
-
+	static int listen_socket(const Options& options) {
+		int s;
 		struct sockaddr_in addr;
+
+		s = socket(PF_INET, SOCK_STREAM, 0);
 		
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(options.listen_port);
 		addr.sin_addr.s_addr = INADDR_ANY;
 
-		if (::bind(sock, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
+		if (::bind(s, (struct sockaddr *)&addr, sizeof(addr)) != 0) {
 			perror("Failed to bind to port.\n");
 		}
 
-		fcntl(sock, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
+		fcntl(s, F_SETFL, fcntl(s, F_GETFL, 0) | O_NONBLOCK);
 
-		listen(sock, 5);
+		listen(s, 5);
+
+		LOG(logINFO) << "Listening on port " << options.listen_port;
+
+		return s;
+	}
+
+	HttpServer::HttpServer(const Options& options) :
+		options(options),
+		sock(listen_socket(options)),
+		io(loop, io_accept, sock) {
 
 		io.set_data(reinterpret_cast<void*>(this));
+		io.start();
 
-		loop.start();
-
+		sio.data = reinterpret_cast<void*>(this);
 		ev_signal_init(&sio, signal_cb, SIGINT);
 		ev_signal_start(loop.get(), &sio);
 	}
