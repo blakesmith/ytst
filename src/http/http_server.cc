@@ -36,6 +36,8 @@ namespace ytst {
 	}
 
 	void HttpServer::start() {
+		sio.start();
+		io.start();
 		loop.start();
 	}
 
@@ -77,10 +79,7 @@ namespace ytst {
 		io(loop, io_accept, sock) {
 
 		io.set_data(reinterpret_cast<void*>(this));
-		io.start();
-
 		sio.set_data(reinterpret_cast<void*>(this));
-		sio.start();
 	}
 
 	HttpServer::~HttpServer() {
