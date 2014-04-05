@@ -89,6 +89,7 @@ PKG_CHECK_MODULES(ffmpeg, libavutil libavformat libavcodec, HAVE_FFMPEG=yes)
 AC_CONFIG_FILES([Makefile
                  src/Makefile
 		 src/http/Makefile
+		 src/ev/Makefile
 		 src/python/Makefile
 		 src/youtube/Makefile
 		 src/stream/Makefile])

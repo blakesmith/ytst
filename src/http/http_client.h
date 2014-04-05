@@ -12,9 +12,10 @@ extern "C" {
 #include "http_handler.h"
 #include "http_response_writer.h"
 #include "buffer.h"
-#include "ev_io.h"
-#include "ev_async.h"
 #include "socket_desc.h"
+
+#include "ev/io.h"
+#include "ev/async.h"
 
 namespace ytst {
 	class HttpClient {
@@ -26,8 +27,8 @@ namespace ytst {
 		HttpResponseWriter writer;
 
 		struct ev_loop *loop;
-		EvAsync notify;
-		EvIo io;
+		ev::Async notify;
+		ev::Io io;
 		std::queue<std::shared_ptr<Buffer>> write_queue;
 
 		std::unique_ptr<HttpHandler> handler;

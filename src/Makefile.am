@@ -1,4 +1,4 @@
-SUBDIRS = http python youtube stream
+SUBDIRS = http python youtube stream ev
 EXTRA_DIST=ytst.init python/youtube-dl
 RAGEL=ragel
 AM_CXXFLAGS=$(ffmpeg_CFLAGS) $(PYTHON_CPPFLAGS) $(PTHREAD_CFLAGS) -Wall -pedantic -D__STDC_CONSTANT_MACROS
@@ -12,14 +12,13 @@ ytst_SOURCES= \
 	buffer.h buffer.cc \
 	writer.h \
 	buffered_writer.h buffered_writer.cc \
-	ev_io.h ev_io.cc \
-	ev_async.h ev_async.cc \
 	socket_desc.h socket_desc.cc
 
 ytst_LDADD= \
 	youtube/libytst_youtube.la \
 	stream/libytst_stream.la \
 	http/libytst_http.la \
+	ev/libytst_ev.la \
 	python/libytst_python.la \
 	$(LIBEV_LIBS) $(ffmpeg_LIBS) $(PYTHON_LDFLAGS) $(PTHREAD_LDFLAGS)
 
