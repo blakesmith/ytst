@@ -9,7 +9,7 @@ namespace ytst {
 	}
 
 	int HttpResponseWriter::write_response(int code, bool chunked, std::string& body) {
-		std::shared_ptr<Buffer> buf(new Buffer(body.c_str(), body.length()));
+		auto buf = std::make_shared<Buffer>(body.c_str(), body.length());
 		write_buffer(code, chunked, buf);
 		return write_last_chunk();
 	}
@@ -34,10 +34,10 @@ namespace ytst {
 
 	int HttpResponseWriter::write_last_chunk() {
 		if (chunked) {
-			return writer.write_buffer(std::shared_ptr<Buffer>(new Buffer("0\r\n\r\n", 5)));
+			return writer.write_buffer(std::make_shared<Buffer>("0\r\n\r\n", 5));
 		}
 
-		return writer.write_buffer(std::shared_ptr<Buffer>(new Buffer("\r\n", 2)));
+		return writer.write_buffer(std::make_shared<Buffer>("\r\n", 2));
 	}
 
 	int HttpResponseWriter::write_header(int code, bool chunked, ssize_t len) {
@@ -66,7 +66,7 @@ namespace ytst {
 			"HTTP/1.1 " + std::to_string(code) + " " + code_name + "\r\n"
 			+ headers + "\r\n";
 
-		std::shared_ptr<Buffer> buf(new Buffer(header_response.c_str(), header_response.length()));
+		auto buf = std::make_shared<Buffer>(header_response.c_str(), header_response.length());
 		writer.write_buffer(buf);
 		headers_sent = true;
 
@@ -89,9 +89,9 @@ namespace ytst {
 			return -1;
 		}
 		int lsize = snprintf(lbuf, 16, "%x\r\n", static_cast<unsigned int>(buf->nbytes()));
-		writer.write_buffer(std::shared_ptr<Buffer>(new Buffer(lbuf, lsize)));
+		writer.write_buffer(std::make_shared<Buffer>(lbuf, lsize));
 		writer.write_buffer(buf);
-		writer.write_buffer(std::shared_ptr<Buffer>(new Buffer("\r\n", 2)));
+		writer.write_buffer(std::make_shared<Buffer>("\r\n", 2));
 
 		return 0;
 	}
