@@ -14,7 +14,11 @@ namespace ytst {
 	}
 
 	std::shared_ptr<AVCodecContext> Decoder::read_file() {
-		avFormat = std::shared_ptr<AVFormatContext>(avformat_alloc_context(), &avformat_free_context);
+		avFormat = std::shared_ptr<AVFormatContext>(avformat_alloc_context(),
+							    [](AVFormatContext* c) {
+								    avformat_close_input(&c);
+								    avformat_free_context(c);
+							    });
 		auto avFormatPtr = avFormat.get();
 
 		LOG(logINFO) << "Opening format";
