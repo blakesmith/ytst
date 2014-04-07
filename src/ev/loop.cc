@@ -7,6 +7,7 @@ namespace ev {
 
 	Loop::~Loop() {
 		stop();
+		ev_loop_destroy(loop);
 	}
 
 	Loop::Loop(const Loop& other) {
