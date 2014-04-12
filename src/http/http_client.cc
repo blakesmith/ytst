@@ -36,6 +36,11 @@ namespace ytst {
 		}
 	}
 
+	void HttpClient::close() {
+		LOG(logINFO) << "Closing HTTP connection";
+		delete this;
+	}
+
 	void HttpClient::notify_callback(struct ev_loop *loop, ev_async *watcher, int revents) {
 		while (writer.has_buffer()) {
 			auto buf = writer.get_buffer();
@@ -76,7 +81,7 @@ namespace ytst {
 		}
 
 		if (nread == 0) {
-			delete this;
+			close();
 		}
 		
 		if (!parser.is_finished()) {
@@ -84,11 +89,13 @@ namespace ytst {
 			parser.execute(&request, read_buffer, nread+1, 0);
 
 			if (parser.has_error()) {
-				delete this;
+				LOG(logINFO) << "Invalid HTTP request";
+				close();
 			}
 
 			if (parser.is_finished()) {
 				LOG(logDEBUG) << "Parse HTTP request finished";
+				writer.header["Connection"] = "close";
 				handler->serve(request, writer);
 				parser.reset();
 			}

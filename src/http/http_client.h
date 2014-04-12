@@ -44,7 +44,7 @@ namespace ytst {
 		void callback(struct ev_loop *loop, ev_io *watcher, int revents);
 		void write_cb(ev_io *watcher);
 		void read_cb(ev_io *watcher);
-		void start_decode(std::string& youtube_id);
+		void close();
 		virtual ~HttpClient();
 	public:
 		HttpClient(std::unique_ptr<HttpHandler> handler,
