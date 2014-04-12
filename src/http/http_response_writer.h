@@ -12,7 +12,6 @@ using namespace std;
 namespace ytst {
 	class HttpResponseWriter : public Writer {
 		BufferedWriter writer;
-		bool headers_sent;
 		bool chunked;
 	public:
 		map<string, string> header;

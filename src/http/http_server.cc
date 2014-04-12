@@ -27,6 +27,7 @@ namespace ytst {
 		socklen_t client_len = sizeof(client_addr);
 
 		int client_sd = accept(watcher->fd, (struct sockaddr *)&client_addr, &client_len);
+
 		if (client_sd < 0) {
 			perror("Accept error\n");
 			return;

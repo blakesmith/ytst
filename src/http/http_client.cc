@@ -79,13 +79,18 @@ namespace ytst {
 			delete this;
 		}
 		
-		if (!headers_sent) {
+		if (!parser.is_finished()) {
 			LOG(logDEBUG) << "Parse HTTP request";
 			parser.execute(&request, read_buffer, nread+1, 0);
+
+			if (parser.has_error()) {
+				delete this;
+			}
+
 			if (parser.is_finished()) {
 				LOG(logDEBUG) << "Parse HTTP request finished";
 				handler->serve(request, writer);
-				headers_sent = true;
+				parser.reset();
 			}
 		}
 	}

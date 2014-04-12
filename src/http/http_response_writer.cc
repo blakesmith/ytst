@@ -10,15 +10,13 @@ namespace ytst {
 
 	int HttpResponseWriter::write_response(int code, bool chunked, std::string& body) {
 		auto buf = std::make_shared<Buffer>(body.c_str(), body.length());
+		write_header(code, chunked, buf->nbytes()+2);
 		write_buffer(code, chunked, buf);
+
 		return write_last_chunk();
 	}
 
 	int HttpResponseWriter::write_buffer(int code, bool chunked, std::shared_ptr<Buffer> buf) {
-		if (!headers_sent) {
-			write_header(code, chunked, buf->nbytes()+2);
-		}
-
 		if (chunked) {
 			write_chunked_buffer(buf);
 		} else {
@@ -68,7 +66,6 @@ namespace ytst {
 
 		auto buf = std::make_shared<Buffer>(header_response.c_str(), header_response.length());
 		writer.write_buffer(buf);
-		headers_sent = true;
 
 		LOG(logDEBUG) << "HTTP headers sent";
 
@@ -96,5 +93,5 @@ namespace ytst {
 		return 0;
 	}
 
-	HttpResponseWriter::HttpResponseWriter() : headers_sent(false) { }
+	HttpResponseWriter::HttpResponseWriter() { }
 }
