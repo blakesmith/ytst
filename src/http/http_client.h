@@ -17,6 +17,8 @@ extern "C" {
 #include "ev/io.h"
 #include "ev/async.h"
 
+#define READ_BUFFER_SIZE 1024
+
 namespace ytst {
 	class HttpClient {
 	private:
@@ -33,6 +35,7 @@ namespace ytst {
 
 		std::unique_ptr<HttpHandler> handler;
 
+		char read_buffer[READ_BUFFER_SIZE];
 		bool headers_sent;
 
 		static void io_cb(struct ev_loop *loop, ev_io *watcher, int revents);

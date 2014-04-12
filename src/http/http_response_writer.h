@@ -2,6 +2,7 @@
 #define YTST_RESPONSE_WRITER_HPP
 
 #include <map>
+#include <atomic>
 
 #include "buffered_writer.h"
 #include "http_response_codes.h"

@@ -96,7 +96,5 @@ namespace ytst {
 		return 0;
 	}
 
-	HttpResponseWriter::HttpResponseWriter() {
-		headers_sent = false;
-	}
+	HttpResponseWriter::HttpResponseWriter() : headers_sent(false) { }
 }

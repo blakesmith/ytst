@@ -4,8 +4,6 @@
 #include "log.h"
 #include "http_client.h"
 
-#define READ_BUFFER_SIZE 1024
-
 namespace ytst {
 	void HttpClient::io_cb(struct ev_loop *loop, ev_io *watcher, int revents) {
 		HttpClient *inst = reinterpret_cast<HttpClient*>(watcher->data);
@@ -69,9 +67,8 @@ namespace ytst {
 	}
 
 	void HttpClient::read_cb(ev_io *watcher) {
-		char buffer[READ_BUFFER_SIZE];
-		ssize_t nread = recv(watcher->fd, buffer, READ_BUFFER_SIZE-1, 0);
-		buffer[nread+1] = '\0';
+		ssize_t nread = recv(watcher->fd, read_buffer, READ_BUFFER_SIZE-1, 0);
+		read_buffer[nread+1] = '\0';
 
 		if (nread < 0) {
 			LOG(logWARNING) << "Read error: " << strerror(errno);
@@ -84,7 +81,7 @@ namespace ytst {
 		
 		if (!headers_sent) {
 			LOG(logDEBUG) << "Parse HTTP request";
-			parser.execute(&request, buffer, nread+1, 0);
+			parser.execute(&request, read_buffer, nread+1, 0);
 			if (parser.is_finished()) {
 				LOG(logDEBUG) << "Parse HTTP request finished";
 				handler->serve(request, writer);
