@@ -92,5 +92,6 @@ AC_CONFIG_FILES([Makefile
 		 src/ev/Makefile
 		 src/python/Makefile
 		 src/youtube/Makefile
-		 src/stream/Makefile])
+		 src/stream/Makefile
+		 test/Makefile])
 AC_OUTPUT

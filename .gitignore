@@ -30,3 +30,7 @@ missing
 *.deps*
 *.libs*
 stamp-h1
+test/bin
+test/*.log
+test/*.trs
+test/*_check

@@ -11,6 +11,7 @@ libytst_http_la_SOURCES = \
 	http_handler.h http_handler.cc \
 	http_request.h \
 	http_route_handler.h http_route_handler.cc \
+	http_url.h http_url.cc \
 	ping_handler.h ping_handler.cc
 
 http11_parser.c:
