@@ -1,4 +1,5 @@
 #include "http_handler.h"
+#include "http_url.h"
 
 namespace ytst {
 	std::map<std::string, std::string> HttpHandler::parse_query(std::string& q) {
@@ -21,7 +22,7 @@ namespace ytst {
 			}
 			auto v = q.substr(pos, end_pos-pos);
 
-			res[k] = v;
+			res[k] = HttpUrl::decode(v);
 			pos = end_pos+1;
 		}
 
