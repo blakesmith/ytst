@@ -9,6 +9,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Various small unit tests
+import io
+import json
 import xml.etree.ElementTree
 
 #from youtube_dl.utils import htmlentity_transform
@@ -16,19 +18,27 @@ from youtube_dl.utils import (
     DateRange,
     encodeFilename,
     find_xpath_attr,
+    fix_xml_ampersands,
     get_meta_content,
     orderedSet,
+    PagedList,
     parse_duration,
+    read_batch_urls,
     sanitize_filename,
     shell_quote,
     smuggle_url,
     str_to_int,
+    struct_unpack,
     timeconvert,
     unescapeHTML,
     unified_strdate,
     unsmuggle_url,
     url_basename,
+    urlencode_postdata,
     xpath_with_ns,
+    parse_iso8601,
+    strip_jsonp,
+    uppercase_escape,
 )
 
 if sys.version_info < (3, 0):
@@ -125,6 +135,7 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(unified_strdate('8/7/2009'), '20090708')
         self.assertEqual(unified_strdate('Dec 14, 2012'), '20121214')
         self.assertEqual(unified_strdate('2012/10/11 01:56:38 +0000'), '20121011')
+        self.assertEqual(unified_strdate('1968-12-10'), '19681210')
 
     def test_find_xpath_attr(self):
         testxml = u'''<root>
@@ -198,7 +209,80 @@ class TestUtil(unittest.TestCase):
         self.assertEqual(parse_duration('1'), 1)
         self.assertEqual(parse_duration('1337:12'), 80232)
         self.assertEqual(parse_duration('9:12:43'), 33163)
+        self.assertEqual(parse_duration('12:00'), 720)
+        self.assertEqual(parse_duration('00:01:01'), 61)
         self.assertEqual(parse_duration('x:y'), None)
+        self.assertEqual(parse_duration('3h11m53s'), 11513)
+        self.assertEqual(parse_duration('62m45s'), 3765)
+        self.assertEqual(parse_duration('6m59s'), 419)
+        self.assertEqual(parse_duration('49s'), 49)
+        self.assertEqual(parse_duration('0h0m0s'), 0)
+        self.assertEqual(parse_duration('0m0s'), 0)
+        self.assertEqual(parse_duration('0s'), 0)
+
+    def test_fix_xml_ampersands(self):
+        self.assertEqual(
+            fix_xml_ampersands('"&x=y&z=a'), '"&amp;x=y&amp;z=a')
+        self.assertEqual(
+            fix_xml_ampersands('"&amp;x=y&wrong;&z=a'),
+            '"&amp;x=y&amp;wrong;&amp;z=a')
+        self.assertEqual(
+            fix_xml_ampersands('&amp;&apos;&gt;&lt;&quot;'),
+            '&amp;&apos;&gt;&lt;&quot;')
+        self.assertEqual(
+            fix_xml_ampersands('&#1234;&#x1abC;'), '&#1234;&#x1abC;')
+        self.assertEqual(fix_xml_ampersands('&#&#'), '&amp;#&amp;#')
+
+    def test_paged_list(self):
+        def testPL(size, pagesize, sliceargs, expected):
+            def get_page(pagenum):
+                firstid = pagenum * pagesize
+                upto = min(size, pagenum * pagesize + pagesize)
+                for i in range(firstid, upto):
+                    yield i
+
+            pl = PagedList(get_page, pagesize)
+            got = pl.getslice(*sliceargs)
+            self.assertEqual(got, expected)
+
+        testPL(5, 2, (), [0, 1, 2, 3, 4])
+        testPL(5, 2, (1,), [1, 2, 3, 4])
+        testPL(5, 2, (2,), [2, 3, 4])
+        testPL(5, 2, (4,), [4])
+        testPL(5, 2, (0, 3), [0, 1, 2])
+        testPL(5, 2, (1, 4), [1, 2, 3])
+        testPL(5, 2, (2, 99), [2, 3, 4])
+        testPL(5, 2, (20, 99), [])
+
+    def test_struct_unpack(self):
+        self.assertEqual(struct_unpack(u'!B', b'\x00'), (0,))
+
+    def test_read_batch_urls(self):
+        f = io.StringIO(u'''\xef\xbb\xbf foo
+            bar\r
+            baz
+            # More after this line\r
+            ; or after this
+            bam''')
+        self.assertEqual(read_batch_urls(f), [u'foo', u'bar', u'baz', u'bam'])
+
+    def test_urlencode_postdata(self):
+        data = urlencode_postdata({'username': 'foo@bar.com', 'password': '1234'})
+        self.assertTrue(isinstance(data, bytes))
+
+    def test_parse_iso8601(self):
+        self.assertEqual(parse_iso8601('2014-03-23T23:04:26+0100'), 1395612266)
+        self.assertEqual(parse_iso8601('2014-03-23T22:04:26+0000'), 1395612266)
+        self.assertEqual(parse_iso8601('2014-03-23T22:04:26Z'), 1395612266)
+
+    def test_strip_jsonp(self):
+        stripped = strip_jsonp('cb ([ {"id":"532cb",\n\n\n"x":\n3}\n]\n);')
+        d = json.loads(stripped)
+        self.assertEqual(d, [{"id": "532cb", "x": 3}])
+
+    def test_uppercase_escpae(self):
+        self.assertEqual(uppercase_escape(u'aä'), u'aä')
+        self.assertEqual(uppercase_escape(u'\\U0001d550'), u'𝕐')
 
 if __name__ == '__main__':
     unittest.main()

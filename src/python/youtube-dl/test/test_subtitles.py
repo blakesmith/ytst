@@ -10,9 +10,11 @@ from test.helper import FakeYDL, md5
 
 
 from youtube_dl.extractor import (
+    BlipTVIE,
     YoutubeIE,
     DailymotionIE,
     TEDIE,
+    VimeoIE,
 )
 
 
@@ -85,7 +87,7 @@ class TestYoutubeSubtitles(BaseTestSubtitles):
 
     def test_youtube_nosubtitles(self):
         self.DL.expect_warning(u'video doesn\'t have subtitles')
-        self.url = 'sAjKT8FhjI8'
+        self.url = 'n5BB19UTcdA'
         self.DL.params['writesubtitles'] = True
         self.DL.params['allsubtitles'] = True
         subtitles = self.getSubtitles()
@@ -167,19 +169,19 @@ class TestTedSubtitles(BaseTestSubtitles):
     def test_subtitles(self):
         self.DL.params['writesubtitles'] = True
         subtitles = self.getSubtitles()
-        self.assertEqual(md5(subtitles['en']), '2154f31ff9b9f89a0aa671537559c21d')
+        self.assertEqual(md5(subtitles['en']), '4262c1665ff928a2dada178f62cb8d14')
 
     def test_subtitles_lang(self):
         self.DL.params['writesubtitles'] = True
         self.DL.params['subtitleslangs'] = ['fr']
         subtitles = self.getSubtitles()
-        self.assertEqual(md5(subtitles['fr']), '7616cbc6df20ec2c1204083c83871cf6')
+        self.assertEqual(md5(subtitles['fr']), '66a63f7f42c97a50f8c0e90bc7797bb5')
 
     def test_allsubtitles(self):
         self.DL.params['writesubtitles'] = True
         self.DL.params['allsubtitles'] = True
         subtitles = self.getSubtitles()
-        self.assertEqual(len(subtitles.keys()), 28)
+        self.assertTrue(len(subtitles.keys()) >= 28)
 
     def test_list_subtitles(self):
         self.DL.expect_warning(u'Automatic Captions not supported by this server')
@@ -201,6 +203,81 @@ class TestTedSubtitles(BaseTestSubtitles):
         subtitles = self.getSubtitles()
         for lang in langs:
             self.assertTrue(subtitles.get(lang) is not None, u'Subtitles for \'%s\' not extracted' % lang)
+
+
+class TestBlipTVSubtitles(BaseTestSubtitles):
+    url = 'http://blip.tv/a/a-6603250'
+    IE = BlipTVIE
+
+    def test_list_subtitles(self):
+        self.DL.expect_warning(u'Automatic Captions not supported by this server')
+        self.DL.params['listsubtitles'] = True
+        info_dict = self.getInfoDict()
+        self.assertEqual(info_dict, None)
+
+    def test_allsubtitles(self):
+        self.DL.expect_warning(u'Automatic Captions not supported by this server')
+        self.DL.params['writesubtitles'] = True
+        self.DL.params['allsubtitles'] = True
+        subtitles = self.getSubtitles()
+        self.assertEqual(set(subtitles.keys()), set(['en']))
+        self.assertEqual(md5(subtitles['en']), '5b75c300af65fe4476dff79478bb93e4')
+
+
+class TestVimeoSubtitles(BaseTestSubtitles):
+    url = 'http://vimeo.com/76979871'
+    IE = VimeoIE
+
+    def test_no_writesubtitles(self):
+        subtitles = self.getSubtitles()
+        self.assertEqual(subtitles, None)
+
+    def test_subtitles(self):
+        self.DL.params['writesubtitles'] = True
+        subtitles = self.getSubtitles()
+        self.assertEqual(md5(subtitles['en']), '8062383cf4dec168fc40a088aa6d5888')
+
+    def test_subtitles_lang(self):
+        self.DL.params['writesubtitles'] = True
+        self.DL.params['subtitleslangs'] = ['fr']
+        subtitles = self.getSubtitles()
+        self.assertEqual(md5(subtitles['fr']), 'b6191146a6c5d3a452244d853fde6dc8')
+
+    def test_allsubtitles(self):
+        self.DL.params['writesubtitles'] = True
+        self.DL.params['allsubtitles'] = True
+        subtitles = self.getSubtitles()
+        self.assertEqual(set(subtitles.keys()), set(['de', 'en', 'es', 'fr']))
+
+    def test_list_subtitles(self):
+        self.DL.expect_warning(u'Automatic Captions not supported by this server')
+        self.DL.params['listsubtitles'] = True
+        info_dict = self.getInfoDict()
+        self.assertEqual(info_dict, None)
+
+    def test_automatic_captions(self):
+        self.DL.expect_warning(u'Automatic Captions not supported by this server')
+        self.DL.params['writeautomaticsub'] = True
+        self.DL.params['subtitleslang'] = ['en']
+        subtitles = self.getSubtitles()
+        self.assertTrue(len(subtitles.keys()) == 0)
+
+    def test_nosubtitles(self):
+        self.DL.expect_warning(u'video doesn\'t have subtitles')
+        self.url = 'http://vimeo.com/56015672'
+        self.DL.params['writesubtitles'] = True
+        self.DL.params['allsubtitles'] = True
+        subtitles = self.getSubtitles()
+        self.assertEqual(len(subtitles), 0)
+
+    def test_multiple_langs(self):
+        self.DL.params['writesubtitles'] = True
+        langs = ['es', 'fr', 'de']
+        self.DL.params['subtitleslangs'] = langs
+        subtitles = self.getSubtitles()
+        for lang in langs:
+            self.assertTrue(subtitles.get(lang) is not None, u'Subtitles for \'%s\' not extracted' % lang)
+
 
 if __name__ == '__main__':
     unittest.main()

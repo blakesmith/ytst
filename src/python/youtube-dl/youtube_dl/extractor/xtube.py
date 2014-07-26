@@ -1,23 +1,29 @@
-import os
+from __future__ import unicode_literals
+
 import re
+import json
 
 from .common import InfoExtractor
 from ..utils import (
-    compat_urllib_parse_urlparse,
     compat_urllib_request,
+    parse_duration,
+    str_to_int,
 )
 
+
 class XTubeIE(InfoExtractor):
-    _VALID_URL = r'^(?:https?://)?(?:www\.)?(?P<url>xtube\.com/watch\.php\?v=(?P<videoid>[^/?&]+))'
+    _VALID_URL = r'https?://(?:www\.)?(?P<url>xtube\.com/watch\.php\?v=(?P<videoid>[^/?&]+))'
     _TEST = {
-        u'url': u'http://www.xtube.com/watch.php?v=kVTUy_G222_',
-        u'file': u'kVTUy_G222_.mp4',
-        u'md5': u'092fbdd3cbe292c920ef6fc6a8a9cdab',
-        u'info_dict': {
-            u"title": u"strange erotica",
-            u"description": u"surreal gay themed erotica...almost an ET kind of thing",
-            u"uploader": u"greenshowers",
-            u"age_limit": 18,
+        'url': 'http://www.xtube.com/watch.php?v=kVTUy_G222_',
+        'md5': '092fbdd3cbe292c920ef6fc6a8a9cdab',
+        'info_dict': {
+            'id': 'kVTUy_G222_',
+            'ext': 'mp4',
+            'title': 'strange erotica',
+            'description': 'surreal gay themed erotica...almost an ET kind of thing',
+            'uploader': 'greenshowers',
+            'duration': 450,
+            'age_limit': 18,
         }
     }
 
@@ -30,25 +36,79 @@ class XTubeIE(InfoExtractor):
         req.add_header('Cookie', 'age_verified=1')
         webpage = self._download_webpage(req, video_id)
 
-        video_title = self._html_search_regex(r'<div class="p_5px[^>]*>([^<]+)', webpage, u'title')
-        video_uploader = self._html_search_regex(r'so_s\.addVariable\("owner_u", "([^"]+)', webpage, u'uploader', fatal=False)
-        video_description = self._html_search_regex(r'<p class="video_description">([^<]+)', webpage, u'description', fatal=False)
-        video_url= self._html_search_regex(r'var videoMp4 = "([^"]+)', webpage, u'video_url').replace('\\/', '/')
-        path = compat_urllib_parse_urlparse(video_url).path
-        extension = os.path.splitext(path)[1][1:]
-        format = path.split('/')[5].split('_')[:2]
-        format[0] += 'p'
-        format[1] += 'k'
-        format = "-".join(format)
+        video_title = self._html_search_regex(r'<p class="title">([^<]+)', webpage, 'title')
+        video_uploader = self._html_search_regex(
+            r'so_s\.addVariable\("owner_u", "([^"]+)', webpage, 'uploader', fatal=False)
+        video_description = self._html_search_regex(
+            r'<p class="fieldsDesc">([^<]+)', webpage, 'description', fatal=False)
+        duration = parse_duration(self._html_search_regex(
+            r'<span class="bold">Runtime:</span> ([^<]+)</p>', webpage, 'duration', fatal=False))
+        view_count = self._html_search_regex(
+            r'<span class="bold">Views:</span> ([\d,\.]+)</p>', webpage, 'view count', fatal=False)
+        if view_count:
+            view_count = str_to_int(view_count)
+        comment_count = self._html_search_regex(
+            r'<div id="commentBar">([\d,\.]+) Comments</div>', webpage, 'comment count', fatal=False)
+        if comment_count:
+            comment_count = str_to_int(comment_count)
+
+        player_quality_option = json.loads(self._html_search_regex(
+            r'playerQualityOption = ({.+?});', webpage, 'player quality option'))
+
+        QUALITIES = ['3gp', 'mp4_normal', 'mp4_high', 'flv', 'mp4_ultra', 'mp4_720', 'mp4_1080']
+        formats = [
+            {
+                'url': furl,
+                'format_id': format_id,
+                'preference': QUALITIES.index(format_id) if format_id in QUALITIES else -1,
+            } for format_id, furl in player_quality_option.items()
+        ]
+        self._sort_formats(formats)
 
         return {
             'id': video_id,
             'title': video_title,
             'uploader': video_uploader,
             'description': video_description,
-            'url': video_url,
-            'ext': extension,
-            'format': format,
-            'format_id': format,
+            'duration': duration,
+            'view_count': view_count,
+            'comment_count': comment_count,
+            'formats': formats,
             'age_limit': 18,
+        }
+
+class XTubeUserIE(InfoExtractor):
+    IE_DESC = 'XTube user profile'
+    _VALID_URL = r'https?://(?:www\.)?xtube\.com/community/profile\.php\?(.*?)user=(?P<username>[^&#]+)(?:$|[&#])'
+
+    def _real_extract(self, url):
+        mobj = re.match(self._VALID_URL, url)
+        username = mobj.group('username')
+
+        profile_page = self._download_webpage(
+            url, username, note='Retrieving profile page')
+
+        video_count = int(self._search_regex(
+            r'<strong>%s\'s Videos \(([0-9]+)\)</strong>'%username, profile_page,
+            'video count'))
+
+        PAGE_SIZE = 25
+        urls = []
+        page_count = (video_count + PAGE_SIZE + 1) // PAGE_SIZE
+        for n in range(1, page_count + 1):
+            lpage_url = 'http://www.xtube.com/user_videos.php?page=%d&u=%s' % (n, username)
+            lpage = self._download_webpage(
+                lpage_url, username,
+                note='Downloading page %d/%d' % (n, page_count))
+            urls.extend(
+                re.findall(r'addthis:url="([^"]+)"', lpage))
+
+        return {
+            '_type': 'playlist',
+            'id': username,
+            'entries': [{
+                '_type': 'url',
+                'url': eurl,
+                'ie_key': 'XTube',
+            } for eurl in urls]
         }

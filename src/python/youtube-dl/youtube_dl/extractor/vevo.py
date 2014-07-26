@@ -1,7 +1,7 @@
+from __future__ import unicode_literals
+
 import re
-import json
 import xml.etree.ElementTree
-import datetime
 
 from .common import InfoExtractor
 from ..utils import (
@@ -16,22 +16,55 @@ class VevoIE(InfoExtractor):
     (currently used by MTVIE)
     """
     _VALID_URL = r'''(?x)
-        (?:https?://www\.vevo\.com/watch/(?:[^/]+/[^/]+/)?|
+        (?:https?://www\.vevo\.com/watch/(?:[^/]+/(?:[^/]+/)?)?|
            https?://cache\.vevo\.com/m/html/embed\.html\?video=|
            https?://videoplayer\.vevo\.com/embed/embedded\?videoId=|
            vevo:)
         (?P<id>[^&?#]+)'''
+
     _TESTS = [{
-        u'url': u'http://www.vevo.com/watch/hurts/somebody-to-die-for/GB1101300280',
-        u'file': u'GB1101300280.mp4',
-        u"md5": u"06bea460acb744eab74a9d7dcb4bfd61",
-        u'info_dict': {
-            u"upload_date": u"20130624",
-            u"uploader": u"Hurts",
-            u"title": u"Somebody to Die For",
-            u"duration": 230.12,
-            u"width": 1920,
-            u"height": 1080,
+        'url': 'http://www.vevo.com/watch/hurts/somebody-to-die-for/GB1101300280',
+        "md5": "06bea460acb744eab74a9d7dcb4bfd61",
+        'info_dict': {
+            'id': 'GB1101300280',
+            'ext': 'mp4',
+            "upload_date": "20130624",
+            "uploader": "Hurts",
+            "title": "Somebody to Die For",
+            "duration": 230.12,
+            "width": 1920,
+            "height": 1080,
+            # timestamp and upload_date are often incorrect; seem to change randomly
+            'timestamp': int,
+        }
+    }, {
+        'note': 'v3 SMIL format',
+        'url': 'http://www.vevo.com/watch/cassadee-pope/i-wish-i-could-break-your-heart/USUV71302923',
+        'md5': '893ec0e0d4426a1d96c01de8f2bdff58',
+        'info_dict': {
+            'id': 'USUV71302923',
+            'ext': 'mp4',
+            'upload_date': '20140219',
+            'uploader': 'Cassadee Pope',
+            'title': 'I Wish I Could Break Your Heart',
+            'duration': 226.101,
+            'age_limit': 0,
+            'timestamp': int,
+        }
+    }, {
+        'note': 'Age-limited video',
+        'url': 'https://www.vevo.com/watch/justin-timberlake/tunnel-vision-explicit/USRV81300282',
+        'info_dict': {
+            'id': 'USRV81300282',
+            'ext': 'mp4',
+            'age_limit': 18,
+            'title': 'Tunnel Vision (Explicit)',
+            'uploader': 'Justin Timberlake',
+            'upload_date': 're:2013070[34]',
+            'timestamp': int,
+        },
+        'params': {
+            'skip_download': 'true',
         }
     }]
     _SMIL_BASE_URL = 'http://smil.lvl3.vevo.com/'
@@ -44,7 +77,7 @@ class VevoIE(InfoExtractor):
                 if version['version'] > last_version['version']:
                     last_version = version
         if last_version['version'] == -1:
-            raise ExtractorError(u'Unable to extract last version of the video')
+            raise ExtractorError('Unable to extract last version of the video')
 
         renditions = xml.etree.ElementTree.fromstring(last_version['data'])
         formats = []
@@ -85,7 +118,7 @@ class VevoIE(InfoExtractor):
             format_url = self._SMIL_BASE_URL + m.group('path')
             formats.append({
                 'url': format_url,
-                'format_id': u'SMIL_' + m.group('cbr'),
+                'format_id': 'SMIL_' + m.group('cbr'),
                 'vcodec': m.group('vcodec'),
                 'acodec': m.group('acodec'),
                 'vbr': int(m.group('vbr')),
@@ -101,33 +134,59 @@ class VevoIE(InfoExtractor):
         video_id = mobj.group('id')
 
         json_url = 'http://videoplayer.vevo.com/VideoService/AuthenticateVideo?isrc=%s' % video_id
-        info_json = self._download_webpage(json_url, video_id, u'Downloading json info')
-        video_info = json.loads(info_json)['video']
+        response = self._download_json(json_url, video_id)
+        video_info = response['video']
+
+        if not video_info:
+            if 'statusMessage' in response:
+                raise ExtractorError('%s said: %s' % (self.IE_NAME, response['statusMessage']), expected=True)
+            raise ExtractorError('Unable to extract videos')
 
         formats = self._formats_from_json(video_info)
+
+        is_explicit = video_info.get('isExplicit')
+        if is_explicit is True:
+            age_limit = 18
+        elif is_explicit is False:
+            age_limit = 0
+        else:
+            age_limit = None
+
+        # Download SMIL
+        smil_blocks = sorted((
+            f for f in video_info['videoVersions']
+            if f['sourceType'] == 13),
+            key=lambda f: f['version'])
+
+        smil_url = '%s/Video/V2/VFILE/%s/%sr.smil' % (
+            self._SMIL_BASE_URL, video_id, video_id.lower())
+        if smil_blocks:
+            smil_url_m = self._search_regex(
+                r'url="([^"]+)"', smil_blocks[-1]['data'], 'SMIL URL',
+                fatal=False)
+            if smil_url_m is not None:
+                smil_url = smil_url_m
+
         try:
-            smil_url = '%s/Video/V2/VFILE/%s/%sr.smil' % (
-                self._SMIL_BASE_URL, video_id, video_id.lower())
             smil_xml = self._download_webpage(smil_url, video_id,
-                                              u'Downloading SMIL info')
+                                              'Downloading SMIL info')
             formats.extend(self._formats_from_smil(smil_xml))
         except ExtractorError as ee:
             if not isinstance(ee.cause, compat_HTTPError):
                 raise
             self._downloader.report_warning(
-                u'Cannot download SMIL information, falling back to JSON ..')
+                'Cannot download SMIL information, falling back to JSON ..')
 
         timestamp_ms = int(self._search_regex(
-            r'/Date\((\d+)\)/', video_info['launchDate'], u'launch date'))
-        upload_date = datetime.datetime.fromtimestamp(timestamp_ms // 1000)
-        info = {
+            r'/Date\((\d+)\)/', video_info['launchDate'], 'launch date'))
+
+        return {
             'id': video_id,
             'title': video_info['title'],
             'formats': formats,
             'thumbnail': video_info['imageUrl'],
-            'upload_date': upload_date.strftime('%Y%m%d'),
+            'timestamp': timestamp_ms // 1000,
             'uploader': video_info['mainArtists'][0]['artistName'],
             'duration': video_info['duration'],
+            'age_limit': age_limit,
         }
-
-        return info
